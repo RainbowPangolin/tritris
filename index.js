@@ -5,19 +5,19 @@ class Block {
         this.canvas = canvas
         this.grid = grid
         this.blockSize = blockSize
-        this.position = position
+        this.centerPosition = position
         this.options = options
         this.isActive = true
         this.centerOffset = [0,0] //y, x 
         // this.draw()
     }
 
-    move(coords){ //places block in temporary position
-        let y = coords[0]
-        let x = coords[1]
+    draw(){ //draws block in temporary position
+        let y = this.centerPosition[0] + this.centerOffset[0]
+        let x = this.centerPosition[1] + this.centerOffset[1]
         //updating grid
         // this.grid[y][x] = 1
-        this.position = [y,x]
+
         //drawing to canvas
         const ctx = this.canvas.getContext("2d");
         ctx.fillStyle = this.options['color'];
@@ -25,10 +25,10 @@ class Block {
         // ctx.fill();
     }
 
-    delete(){ //removes block
-        let y = this.position[0]
-        let x = this.position[1]
-        this.position = [-1,-1]
+    erase(){ //removes block
+        let y = this.centerPosition[0] + this.centerOffset[0]
+        let x = this.centerPosition[1] + this.centerOffset[1]
+        // this.centerPosition = [-1,-1] //should dunno if I'll need this
         // this.grid[y][x] = 0
         const ctx = this.canvas.getContext("2d");
         ctx.clearRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
@@ -36,8 +36,15 @@ class Block {
 
     place(){ //places block in current, final position
         this.isActive = false
-        this.grid[y][x] = 1
+        let y = this.centerPosition[0] + this.centerOffset[0]
+        let x = this.centerPosition[1] + this.centerOffset[1]
+        this.grid[y][x] = this
+        console.log('block placed')
+        console.log(this)
+    }
 
+    signal(){
+        console.log('signaled')
     }
 }
 
@@ -49,44 +56,136 @@ class Piece {
         this.grid = grid
         this.blockSize = blockSize
         this.centerPosition = centerPosition
+        this.orientation = 0 //4 positions, 0 1 2 3
         this.isActive = true
         this.grace = 5
         // this.draw()
+
+        this.spawn(centerPosition)
     }
 
-    spawn(){
-        
+    spawn(coords){
+        let y = coords[0]
+        let x = coords[1]
+        this.centerPosition = [y, x]
+        // this.blocks = []
+        if(this.shape == 'I'){
+            //block1 is the center block
+            let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+            let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+            let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+
+            centerBlock.centerOffset = [0,0]
+            block2.centerOffset = [-1,0]
+            block3.centerOffset = [1,0]
+
+            centerBlock.draw()
+            block2.draw()
+            block3.draw()
+
+            this.blocks = [centerBlock, block2, block3]
+        } else if (this.shape == 'L'){
+            let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+            let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+            let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+            centerBlock.draw([y, x])
+            block2.draw([y - 1, x])
+            block3.draw([y, x + 1])
+            centerBlock.centerOffset = [0,0]
+            block2.centerOffset = [-1,0]
+            block3.centerOffset = [1,0]
+            this.blocks = [centerBlock, block2, block3]
+        } else {
+            throw new Error("bad bad")
+        }
+    }
+
+    rotate(direction){
+        //updates centerOffset of each block
+        let y = this.centerPosition[0]
+        let x = this.centerPosition[1]
+        this.blocks.forEach( (block) => {
+            // console.log(block)
+            block.erase()
+        })
+
+
+        if(direction == 'RIGHT'){
+            this.orientation = (4 + (this.orientation + 1)) % 4 
+        } else if (direction == 'LEFT') {
+            this.orientation = (4 + (this.orientation - 1)) % 4 
+        }
+
+        if(this.shape == 'I') {
+            console.log(this.orientation)
+
+            switch(this.orientation){
+                case 0:
+                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[2].centerOffset = [1,0]
+                    break
+                case 1:
+                    this.blocks[1].centerOffset = [0,1]
+                    this.blocks[2].centerOffset = [0,-1]
+                    break
+                case 2:
+                    this.blocks[1].centerOffset = [1,0]
+                    this.blocks[2].centerOffset = [-1,0]
+                    break
+                case 3: 
+                    this.blocks[1].centerOffset = [0,-1]
+                    this.blocks[2].centerOffset = [0,1]
+                    break
+            }
+            //updates centerOffset of each block based on new orientation
+        } else { //shape is 'L'
+            switch(this.orientation){
+                case 0:
+                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[2].centerOffset = [1,0]
+                    break
+                case 1:
+                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[2].centerOffset = [1,0]
+                    break
+                case 2:
+                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[2].centerOffset = [1,0]
+                    break
+                case 3: 
+                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[2].centerOffset = [1,0]
+                    break
+            }
+        }
+
+        this.blocks.forEach( (block) => {
+            // console.log(block)
+            block.draw()
+        })
+    }
+
+    attemptMove(coords){
+        if( this.wouldBlock(coords) ){
+            //do nothing
+        } else {
+            this.move(coords)
+        }
     }
 
     move(coords){
         let y = coords[0]
         let x = coords[1]
-        this.centerPosition = [y, x]
-        this.blocks = []
-        if(this.shape == 'I'){
-            //block1 is the center block
-            let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y-1,x])
-            let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y+1,x])
-            centerBlock.move([y, x])
-            block2.move([y - 1, x])
-            block3.move([y + 1, x])
-            centerBlock.centerOffset = [0,0]
-            block2.centerOffset = [0,0]
-            block3.centerOffset = [0,0]
+        this.blocks.forEach( (block) => {
+            console.log(block)
+            block.erase()
+        })
 
-            this.blocks = [centerBlock, block2, block3]
-        } else if (this.shape == 'L'){
-            let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y-1,x])
-            let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x+1])
-            centerBlock.move([y, x])
-            block2.move([y - 1, x])
-            block3.move([y, x + 1])
-            this.blocks = [centerBlock, block2, block3]
-        } else {
-            throw new Error("bad bad")
-        }
+        this.centerPosition = [y, x]
+
+        //erase then redraw
+        //swithc case for  each orientation and shape
+      
     }
 
     //checks if moving to coords would be illegal
@@ -101,7 +200,12 @@ class Piece {
     }
 
     place(){ //sets flag for board to place piece in current, final position
+        console.log('piece being placed')
         this.isActive = false
+        this.blocks.forEach((block) => {
+            console.log('attempting to place: ', block)
+            block.place()
+        })
     }
 
     useGrace() { //each piece has 5/gravity seconds of grace time- how long a piece can sit on the ground before automatically being placed
@@ -152,17 +256,25 @@ class Board {
     
     addPiece(shape){
         let curPiece = new Piece(shape, this.gravity, this.canvas, this.grid, this.blockSize, [2, 4])
-        curPiece.move([2, 4])
+        // curPiece.move([2, 4])
         this.curPiece = curPiece
     }
 
     update(direction = 'down'){
         if(this.blockDropped(this.curPiece)){
             this.curPiece = new Piece('I', this.gravity, this.canvas, this.grid, this.blockSize, [2, 4])
-            this.curPiece.move([2, 4])
+            // this.curPiece.move([2, 4])
             return
         }  
-        this.curPiece.delete()
+
+        //bad code for testing rotation
+        if(direction == "ROTATERIGHT"){
+            // console.log('asdf')
+            this.curPiece.rotate('RIGHT')
+            return
+        }
+
+
         let newPosition
         let lastPosition = this.curPiece.centerPosition
         newPosition = lastPosition
@@ -179,7 +291,7 @@ class Board {
 
 
         }
-        this.curPiece.move(newPosition)
+        this.curPiece.attemptMove(newPosition)
 
     }
 
@@ -194,14 +306,14 @@ class Board {
 
 let newBoard = new Board()
 
-newBoard.addPiece('L')
+newBoard.addPiece('I')
 
 console.log(newBoard.grid)
 
-setInterval(function () {
-    newBoard.update()
-    console.log('moved')
-}, 1000);
+// setInterval(function () {
+//     newBoard.update()
+//     console.log('moved')
+// }, 1000);
 
 document.addEventListener("keydown", (event) => {
     switch(event.key){
@@ -210,6 +322,12 @@ document.addEventListener("keydown", (event) => {
             break
         case 'j':
             newBoard.update('left')
+            break        
+        case 'a':
+            newBoard.update('ROTATERIGHT')
+            break
+        case 'd':
+            newBoard.update('ROTATELEFT')
             break
         case ' ':
             newBoard.curPiece.place()
