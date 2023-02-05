@@ -233,7 +233,7 @@ class Board {
     }
     
     addPiece(shape){
-        let curPiece = new Piece(shape, this.gravity, this.canvas, this.grid, this.blockSize, [2, 4])
+        let curPiece = new Piece(shape, this.canvas, this.grid, this.blockSize, [2, 4])
         this.curPiece = curPiece
     }
 
