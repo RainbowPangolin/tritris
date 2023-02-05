@@ -1,35 +1,25 @@
 class Block {
-    constructor(gravity, canvas, grid, blockSize, position, options = {'color':"#FF0000"}){
-        // this.shape = shape
-        this.gravity = gravity
+    constructor(canvas, grid, blockSize, position, options = {'color':"#FF0000"}){
         this.canvas = canvas
         this.grid = grid
         this.blockSize = blockSize
         this.centerPosition = position
         this.options = options
         this.isActive = true
-        this.centerOffset = [0,0] //y, x 
-        // this.draw()
+        this.centerOffset = [0,0] 
     }
 
-    draw(){ //draws block in temporary position
+    draw(){
         let y = this.centerPosition[0] + this.centerOffset[0]
         let x = this.centerPosition[1] + this.centerOffset[1]
-        //updating grid
-        // this.grid[y][x] = 1
-
-        //drawing to canvas
         const ctx = this.canvas.getContext("2d");
         ctx.fillStyle = this.options['color'];
         ctx.fillRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
-        // ctx.fill();
     }
 
-    erase(){ //removes block
+    erase(){ //removes block, does not affect logic
         let y = this.centerPosition[0] + this.centerOffset[0]
         let x = this.centerPosition[1] + this.centerOffset[1]
-        // this.centerPosition = [-1,-1] //should dunno if I'll need this
-        // this.grid[y][x] = 0
         const ctx = this.canvas.getContext("2d");
         ctx.clearRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
     }
@@ -39,21 +29,14 @@ class Block {
         let y = this.centerPosition[0] + this.centerOffset[0]
         let x = this.centerPosition[1] + this.centerOffset[1]
         this.grid[y][x] = this
-
         this.draw()
-        console.log('block placed')
-        // console.log(this)
     }
 
-    signal(){
-        console.log('signaled')
-    }
 }
 
 class Piece {
-    constructor(shape, gravity, canvas, grid, blockSize, centerPosition){
+    constructor(shape, canvas, grid, blockSize, centerPosition){
         this.shape = shape
-        this.gravity = gravity
         this.canvas = canvas
         this.grid = grid
         this.blockSize = blockSize
@@ -61,7 +44,6 @@ class Piece {
         this.orientation = 0 //4 positions, 0 1 2 3
         this.isActive = true
         this.grace = 5
-        // this.draw()
 
         this.spawn(centerPosition)
     }
@@ -70,12 +52,10 @@ class Piece {
         let y = coords[0]
         let x = coords[1]
         this.centerPosition = [y, x]
-        // this.blocks = []
 
-        let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-        let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-        let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-
+        let centerBlock = new Block(this.canvas, this.grid, this.blockSize, [y,x])
+        let block2 = new Block(this.canvas, this.grid, this.blockSize, [y,x])
+        let block3 = new Block(this.canvas, this.grid, this.blockSize, [y,x])
     
         if(this.shape == 'I'){
             centerBlock.centerOffset = [0,0]
@@ -86,7 +66,7 @@ class Piece {
             block2.centerOffset = [-1,0]
             block3.centerOffset = [0,1]
         } else {
-            throw new Error("bad bad")
+            throw new Error("Illegal shap")
         }
 
         centerBlock.draw()
@@ -104,15 +84,6 @@ class Piece {
     }
 
     rotate(direction){
-        //updates centerOffset of each block
-        let y = this.centerPosition[0]
-        let x = this.centerPosition[1]
-        // this.blocks.forEach( (block) => {
-        //     // console.log(block)
-        //     block.erase()
-        // })
-
-
         if(direction == 'ROTATERIGHT'){
             this.orientation = (4 + (this.orientation + 1)) % 4 
         } else if (direction == 'ROTATELEFT') {
@@ -120,10 +91,9 @@ class Piece {
         } else if (direction == 'ROTATE180'){
             this.orientation = (4 + (this.orientation + 2)) % 4 
         }
-        console.log(this.orientation)
 
+        //updates centerOffset of each block based on new orientation
         if(this.shape == 'I') {
-
             switch(this.orientation){
                 case 0:
                     this.blocks[1].centerOffset = [-1,0]
@@ -142,7 +112,6 @@ class Piece {
                     this.blocks[2].centerOffset = [0,1]
                     break
             }
-            //updates centerOffset of each block based on new orientation
         } else { //shape is 'L'
             switch(this.orientation){
                 case 0:
@@ -163,15 +132,9 @@ class Piece {
                     break
             }
         }
-
-        // this.blocks.forEach( (block) => {
-        //     // console.log(block)
-        //     block.draw()
-        // })
     }
 
     attemptTranslate(direction){
-        console.log('attempt translate')
         let newPosition
         let lastPosition = this.centerPosition
         newPosition = lastPosition
@@ -185,11 +148,7 @@ class Piece {
             case 'MOVERIGHT':
                 newPosition[1] += 1
                 break
-
-
         }
-        // this.curPiece.attemptTranslate(newPosition)
-
         if( this.wouldBlock(newPosition) ){
             //do nothing
         } else {
@@ -201,22 +160,10 @@ class Piece {
     translate(coords){ //translation on a plane- move left right or down 
         let y = coords[0]
         let x = coords[1]
-        // this.blocks.forEach( (block) => {
-        //     // console.log(block)
-        //     block.erase()
-        // })
-
         this.centerPosition = [y, x]
-
         this.blocks.forEach( (block) => {
-            // console.log(block)
             block.centerPosition = [y, x]
-
-            // block.draw()
         })
-        //erase then redraw
-        //swithc case for  each orientation and shape
-      
     }
 
     //checks if moving to coords would be illegal
@@ -287,14 +234,12 @@ class Board {
     
     addPiece(shape){
         let curPiece = new Piece(shape, this.gravity, this.canvas, this.grid, this.blockSize, [2, 4])
-        // curPiece.translate([2, 4])
         this.curPiece = curPiece
     }
 
     update(action = 'MOVEDOWN'){
         
         this.curPiece.blocks.forEach( (block) => {
-            // console.log(block)
             block.erase()
         })
 
@@ -316,7 +261,6 @@ class Board {
         actions[action]?.call(null) ?? console.log('illegal move')
 
         this.curPiece.blocks.forEach( (block) => {
-            // console.log(block)
             block.draw()
         })
     }
