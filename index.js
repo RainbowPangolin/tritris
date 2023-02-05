@@ -10,26 +10,29 @@ class Block {
     }
 
     draw(){
-        let y = this.centerPosition[0] + this.centerOffset[0]
-        let x = this.centerPosition[1] + this.centerOffset[1]
+        let [y,x] = this.getAbsolutePosition()
         const ctx = this.canvas.getContext("2d");
         ctx.fillStyle = this.options['color'];
         ctx.fillRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
     }
 
     erase(){ //removes block, does not affect logic
-        let y = this.centerPosition[0] + this.centerOffset[0]
-        let x = this.centerPosition[1] + this.centerOffset[1]
+        let [y,x] = this.getAbsolutePosition()
         const ctx = this.canvas.getContext("2d");
         ctx.clearRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
     }
 
     place(){ //places block in current, final position
+        let [y,x] = this.getAbsolutePosition()
         this.isActive = false
-        let y = this.centerPosition[0] + this.centerOffset[0]
-        let x = this.centerPosition[1] + this.centerOffset[1]
         this.grid[y][x] = this
         this.draw()
+    }
+
+    getAbsolutePosition(){ //returns y,x coordinates relative to Grid based on center's osition and offset
+        let y = this.centerPosition[0] + this.centerOffset[0]
+        let x = this.centerPosition[1] + this.centerOffset[1]
+        return [y, x]
     }
 
 }
@@ -82,7 +85,7 @@ class Piece {
         //Note- this is probably a silly way to do rotation collision checks but it's requires less code for now
         this.rotate(direction)
 
-        if (this.wouldBlock(this.centerPosition)) {
+        if (this.illegalPosition()) {
             //any 4 rotations returns to original position
             this.rotate(direction)
             this.rotate(direction)
@@ -142,9 +145,10 @@ class Piece {
     }
 
     attemptTranslate(direction){
+        // console.log('asdf')
         let newPosition
-        let lastPosition = this.centerPosition
-        newPosition = lastPosition
+        const lastPosition = this.centerPosition
+        newPosition = structuredClone(lastPosition)
         switch(direction){
             case 'MOVEDOWN':
                 newPosition[0] += 1
@@ -156,11 +160,13 @@ class Piece {
                 newPosition[1] += 1
                 break
         }
-        if( this.wouldBlock(newPosition) ){
-            //do nothing
-        } else {
-            this.translate(newPosition)
-        }
+        this.translate(newPosition)
+
+        console.log(this.illegalPosition())
+        if( this.illegalPosition() ){
+            //undo move
+            this.translate(lastPosition)
+        } 
         
     }
 
@@ -173,9 +179,16 @@ class Piece {
         })
     }
 
-    //checks if moving to coords would be illegal
-    wouldBlock(coords){ 
-        //for each block, check if
+    //checks if current position overlaps with existing blocks or OOB
+    illegalPosition(){
+        for (let block of this.blocks){
+            let [y, x] = block.getAbsolutePosition()
+            if(this.grid[y][x] != 0){
+                return true
+            }
+        }
+
+        return false
     }
 
     delete(){
@@ -265,8 +278,7 @@ class Board {
                 this.addPiece('L')
             },
         }
-        actions[action]?.call(null) ?? console.log('illegal move')
-
+        actions[action]?.call(this)
         this.curPiece.blocks.forEach( (block) => {
             block.draw()
         })
