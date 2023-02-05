@@ -100,20 +100,29 @@ class Piece {
         }
     }
 
+    attemptRotate(direction){
+        //rotate, then check if blocks from current position
+        //if blocks, unrotate
+
+        this.rotate(direction)
+    }
+
     rotate(direction){
         //updates centerOffset of each block
         let y = this.centerPosition[0]
         let x = this.centerPosition[1]
-        this.blocks.forEach( (block) => {
-            // console.log(block)
-            block.erase()
-        })
+        // this.blocks.forEach( (block) => {
+        //     // console.log(block)
+        //     block.erase()
+        // })
 
 
-        if(direction == 'RIGHT'){
+        if(direction == 'ROTATERIGHT'){
             this.orientation = (4 + (this.orientation + 1)) % 4 
-        } else if (direction == 'LEFT') {
+        } else if (direction == 'ROTATELEFT') {
             this.orientation = (4 + (this.orientation - 1)) % 4 
+        } else if (direction == 'ROTATE180'){
+            this.orientation = (4 + (this.orientation + 2)) % 4 
         }
 
         if(this.shape == 'I') {
@@ -159,30 +168,56 @@ class Piece {
             }
         }
 
-        this.blocks.forEach( (block) => {
-            // console.log(block)
-            block.draw()
-        })
+        // this.blocks.forEach( (block) => {
+        //     // console.log(block)
+        //     block.draw()
+        // })
     }
 
-    attemptMove(coords){
-        if( this.wouldBlock(coords) ){
+    attemptTranslate(direction){
+        console.log('attempt translate')
+        let newPosition
+        let lastPosition = this.centerPosition
+        newPosition = lastPosition
+        switch(direction){
+            case 'MOVEDOWN':
+                newPosition[0] += 1
+                break
+            case 'MOVELEFT':
+                newPosition[1] -= 1
+                break
+            case 'MOVERIGHT':
+                newPosition[1] += 1
+                break
+
+
+        }
+        // this.curPiece.attemptTranslate(newPosition)
+
+        if( this.wouldBlock(newPosition) ){
             //do nothing
         } else {
-            this.move(coords)
+            this.translate(newPosition)
         }
+        
     }
 
-    move(coords){
+    translate(coords){ //translation on a plane- move left right or down 
         let y = coords[0]
         let x = coords[1]
-        this.blocks.forEach( (block) => {
-            console.log(block)
-            block.erase()
-        })
+        // this.blocks.forEach( (block) => {
+        //     // console.log(block)
+        //     block.erase()
+        // })
 
         this.centerPosition = [y, x]
 
+        this.blocks.forEach( (block) => {
+            // console.log(block)
+            block.centerPosition = [y, x]
+
+            // block.draw()
+        })
         //erase then redraw
         //swithc case for  each orientation and shape
       
@@ -256,42 +291,54 @@ class Board {
     
     addPiece(shape){
         let curPiece = new Piece(shape, this.gravity, this.canvas, this.grid, this.blockSize, [2, 4])
-        // curPiece.move([2, 4])
+        // curPiece.translate([2, 4])
         this.curPiece = curPiece
     }
 
-    update(direction = 'down'){
-        if(this.blockDropped(this.curPiece)){
-            this.curPiece = new Piece('I', this.gravity, this.canvas, this.grid, this.blockSize, [2, 4])
-            // this.curPiece.move([2, 4])
-            return
-        }  
+    update(action = 'MOVEDOWN'){
+        
+        this.curPiece.blocks.forEach( (block) => {
+            // console.log(block)
+            block.erase()
+        })
+        //could probably be easily cleaned up but this isn't that bad
+        const actions = {
+            'MOVEDOWN': () => {this.curPiece.attemptTranslate(action)},
+            'MOVELEFT': () => {this.curPiece.attemptTranslate(action)},
+            'MOVERIGHT': () => {this.curPiece.attemptTranslate(action)},
 
-        //bad code for testing rotation
-        if(direction == "ROTATERIGHT"){
-            // console.log('asdf')
-            this.curPiece.rotate('RIGHT')
-            return
+            'ROTATERIGHT': () => {this.curPiece.attemptRotate(action)},
+            'ROTATELEFT': () => {this.curPiece.attemptRotate(action)},
+            'ROTATE180': () => {this.curPiece.attemptRotate(action)}
         }
 
 
-        let newPosition
-        let lastPosition = this.curPiece.centerPosition
-        newPosition = lastPosition
-        switch(direction){
-            case 'down':
-                newPosition[0] += 1
-                break
-            case 'left':
-                newPosition[1] -= 1
-                break
-            case 'right':
-                newPosition[1] += 1
-                break
+        actions[action].call(null)
 
 
-        }
-        this.curPiece.attemptMove(newPosition)
+
+        this.curPiece.blocks.forEach( (block) => {
+            // console.log(block)
+            block.draw()
+        })
+
+
+        // if (action == "PLACE"){
+        //     this.curPiece.place()
+        //     return
+        // }
+
+        // //bad code for testing rotation
+        // if(action == "ROTATERIGHT"){
+        //     // console.log('asdf')
+        //     this.curPiece.rotate('RIGHT')
+        //     return
+        // }
+
+        // // if(action == "MOVEDOWN"){
+        // //     this.curPiece.attemptTranslate('down')
+        // // }
+       
 
     }
 
@@ -310,18 +357,18 @@ newBoard.addPiece('I')
 
 console.log(newBoard.grid)
 
-// setInterval(function () {
-//     newBoard.update()
-//     console.log('moved')
-// }, 1000);
+setInterval(function () {
+    newBoard.update()
+    console.log('translated')
+}, 1000);
 
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'l':
-            newBoard.update('right')
+            newBoard.update('MOVERIGHT')
             break
         case 'j':
-            newBoard.update('left')
+            newBoard.update('MOVELEFT')
             break        
         case 'a':
             newBoard.update('ROTATERIGHT')
@@ -330,7 +377,8 @@ document.addEventListener("keydown", (event) => {
             newBoard.update('ROTATELEFT')
             break
         case ' ':
-            newBoard.curPiece.place()
+            newBoard.update('PLACE')
+            
     }
     
 })
