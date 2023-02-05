@@ -39,8 +39,10 @@ class Block {
         let y = this.centerPosition[0] + this.centerOffset[0]
         let x = this.centerPosition[1] + this.centerOffset[1]
         this.grid[y][x] = this
+
+        this.draw()
         console.log('block placed')
-        console.log(this)
+        // console.log(this)
     }
 
     signal(){
@@ -69,35 +71,29 @@ class Piece {
         let x = coords[1]
         this.centerPosition = [y, x]
         // this.blocks = []
+
+        let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+        let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+        let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
+
+    
         if(this.shape == 'I'){
-            //block1 is the center block
-            let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-
             centerBlock.centerOffset = [0,0]
             block2.centerOffset = [-1,0]
             block3.centerOffset = [1,0]
-
-            centerBlock.draw()
-            block2.draw()
-            block3.draw()
-
-            this.blocks = [centerBlock, block2, block3]
         } else if (this.shape == 'L'){
-            let centerBlock = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            let block2 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            let block3 = new Block(1, this.canvas, this.grid, this.blockSize, [y,x])
-            centerBlock.draw([y, x])
-            block2.draw([y - 1, x])
-            block3.draw([y, x + 1])
             centerBlock.centerOffset = [0,0]
             block2.centerOffset = [-1,0]
-            block3.centerOffset = [1,0]
-            this.blocks = [centerBlock, block2, block3]
+            block3.centerOffset = [0,1]
         } else {
             throw new Error("bad bad")
         }
+
+        centerBlock.draw()
+        block2.draw()
+        block3.draw()
+
+        this.blocks = [centerBlock, block2, block3]
     }
 
     attemptRotate(direction){
@@ -124,9 +120,9 @@ class Piece {
         } else if (direction == 'ROTATE180'){
             this.orientation = (4 + (this.orientation + 2)) % 4 
         }
+        console.log(this.orientation)
 
         if(this.shape == 'I') {
-            console.log(this.orientation)
 
             switch(this.orientation){
                 case 0:
@@ -151,19 +147,19 @@ class Piece {
             switch(this.orientation){
                 case 0:
                     this.blocks[1].centerOffset = [-1,0]
-                    this.blocks[2].centerOffset = [1,0]
+                    this.blocks[2].centerOffset = [0,1]
                     break
                 case 1:
-                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[1].centerOffset = [0,1]
                     this.blocks[2].centerOffset = [1,0]
                     break
                 case 2:
-                    this.blocks[1].centerOffset = [-1,0]
-                    this.blocks[2].centerOffset = [1,0]
+                    this.blocks[1].centerOffset = [1,0]
+                    this.blocks[2].centerOffset = [0,-1]
                     break
                 case 3: 
                     this.blocks[1].centerOffset = [-1,0]
-                    this.blocks[2].centerOffset = [1,0]
+                    this.blocks[2].centerOffset = [0,-1]
                     break
             }
         }
@@ -234,7 +230,7 @@ class Piece {
         })
     }
 
-    place(){ //sets flag for board to place piece in current, final position
+    hardDrop(){ //keeps moving down until dropped. Inputs should be blocked in transit, if transit time not 0
         console.log('piece being placed')
         this.isActive = false
         this.blocks.forEach((block) => {
@@ -301,6 +297,8 @@ class Board {
             // console.log(block)
             block.erase()
         })
+
+
         //could probably be easily cleaned up but this isn't that bad
         const actions = {
             'MOVEDOWN': () => {this.curPiece.attemptTranslate(action)},
@@ -309,37 +307,18 @@ class Board {
 
             'ROTATERIGHT': () => {this.curPiece.attemptRotate(action)},
             'ROTATELEFT': () => {this.curPiece.attemptRotate(action)},
-            'ROTATE180': () => {this.curPiece.attemptRotate(action)}
+            'ROTATE180': () => {this.curPiece.attemptRotate(action)},
+            'HARDDROP': () => {
+                this.curPiece.hardDrop()
+                this.addPiece('L')
+            },
         }
-
-
-        actions[action].call(null)
-
-
+        actions[action]?.call(null) ?? console.log('illegal move')
 
         this.curPiece.blocks.forEach( (block) => {
             // console.log(block)
             block.draw()
         })
-
-
-        // if (action == "PLACE"){
-        //     this.curPiece.place()
-        //     return
-        // }
-
-        // //bad code for testing rotation
-        // if(action == "ROTATERIGHT"){
-        //     // console.log('asdf')
-        //     this.curPiece.rotate('RIGHT')
-        //     return
-        // }
-
-        // // if(action == "MOVEDOWN"){
-        // //     this.curPiece.attemptTranslate('down')
-        // // }
-       
-
     }
 
     blockDropped(piece){
@@ -357,13 +336,16 @@ newBoard.addPiece('I')
 
 console.log(newBoard.grid)
 
-setInterval(function () {
-    newBoard.update()
-    console.log('translated')
-}, 1000);
+// setInterval(function () {
+//     newBoard.update()
+//     console.log('translated')
+// }, 1000);
 
 document.addEventListener("keydown", (event) => {
     switch(event.key){
+        case 'k':
+            newBoard.update('MOVEDOWN')
+            break
         case 'l':
             newBoard.update('MOVERIGHT')
             break
@@ -371,13 +353,13 @@ document.addEventListener("keydown", (event) => {
             newBoard.update('MOVELEFT')
             break        
         case 'a':
-            newBoard.update('ROTATERIGHT')
-            break
-        case 'd':
             newBoard.update('ROTATELEFT')
             break
+        case 'd':
+            newBoard.update('ROTATERIGHT')
+            break
         case ' ':
-            newBoard.update('PLACE')
+            newBoard.update('HARDDROP')
             
     }
     
