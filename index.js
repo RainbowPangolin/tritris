@@ -79,8 +79,15 @@ class Piece {
     attemptRotate(direction){
         //rotate, then check if blocks from current position
         //if blocks, unrotate
-
+        //Note- this is probably a silly way to do rotation collision checks but it's requires less code for now
         this.rotate(direction)
+
+        if (this.wouldBlock(this.centerPosition)) {
+            //any 4 rotations returns to original position
+            this.rotate(direction)
+            this.rotate(direction)
+            this.rotate(direction)
+        } 
     }
 
     rotate(direction){
