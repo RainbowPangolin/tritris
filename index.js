@@ -44,10 +44,9 @@ class Piece {
         this.grid = grid
         this.blockSize = blockSize
         this.centerPosition = centerPosition
-        this.orientation = 0 //4 positions, 0 1 2 3
+        this.orientation = 0 //4 positions, 0 1 2 3  
         this.isActive = true
         this.grace = 5
-
         this.spawn(centerPosition)
     }
 
@@ -62,8 +61,8 @@ class Piece {
     
         if(this.shape == 'I'){
             centerBlock.centerOffset = [0,0]
-            block2.centerOffset = [-1,0]
-            block3.centerOffset = [1,0]
+            block2.centerOffset = [0,1]
+            block3.centerOffset = [0,-1]
         } else if (this.shape == 'L'){
             centerBlock.centerOffset = [0,0]
             block2.centerOffset = [-1,0]
@@ -78,6 +77,11 @@ class Piece {
 
         this.blocks = [centerBlock, block2, block3]
     }
+
+    // showShadow(){
+    //     this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition)
+    //     while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
+    // }
 
     //returns true if rotation worked, false if failed
     attemptRotate(direction){
@@ -106,15 +110,46 @@ class Piece {
         //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
         //test1 was alrteady tried, so table contains test2, 3, 4, and 5
         const kickTable = {
-            '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]]
+            'L': {
+                '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]],
+                '1,0': [[0, 1], [-1, 1], [2, 0], [2,1]],
+                '1,2': [[0,1], [-1, 1], [2,0], [2,1]],
+                '2,1': [[0,-1], [1, -1], [-2,0], [-2,-1]],
+                '2,3': [[0,1], [1,1], [-2,0], [-2,1]],
+                '3,2': [[0,-1], [-1,-1], [2,0], [2,-1]],
+                '3,0': [[0,-1], [-1,-1], [2,0], [2,-1]],
+                '0,3': [[0,1], [1,1], [-2,0], [-2, 1]]
+            },
+            'I': {
+                '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]],
+                '1,0': [[0, 1], [-1, 1], [2, 0], [2,1]],
+                '1,2': [[0,1], [-1, 1], [2,0], [2,1]],
+                '2,1': [[0,-1], [1, -1], [-2,0], [-2,-1]],
+                '2,3': [[0,1], [1,1], [-2,0], [-2,1]],
+                '3,2': [[0,-1], [-1,-1], [2,0], [2,-1]],
+                '3,0': [[0,-1], [-1,-1], [2,0], [2,-1]],
+                '0,3': [[0,1], [1,1], [-2,0], [-2, 1]]
+            },
+            'I4': { // adjusted for 3 long I piece
+                '0,1': [[0, -2], [0, 1], [-1, -2], [2, 1]],
+                '1,0': [[0, 2], [0, -1], [1, 2], [-2,-1]],
+                '1,2': [[0,-1], [0, 2], [2,-1], [-1,2]],
+                '2,1': [[0,1], [0, -2], [-2,1], [1,-2]],
+                '2,3': [[0,2], [0,-1], [1,2], [-2,-1]],
+                '3,2': [[0,-2], [0,1], [-1,-2], [2,1]],
+                '3,0': [[0,1], [0,-2], [-2,1], [1,-2]],
+                '0,3': [[0,-1], [0,2], [2,-1], [-1,2]]
+            }
+            
         }
         let rotation = String([initialOrientation, newOrientation])
 
-        for (let coordinates of kickTable[rotation]){
+        for (let coordinates of kickTable[this.shape][rotation]){
+            console.log(rotation, coordinates)
+
             if(this.attemptTranslate(coordinates)){
                 return true
             }
-            console.log(rotation, coordinates)
         }
         
 
@@ -135,20 +170,20 @@ class Piece {
         if(this.shape == 'I') {
             switch(this.orientation){
                 case 0:
-                    this.blocks[1].centerOffset = [-1,0]
-                    this.blocks[2].centerOffset = [1,0]
-                    break
-                case 1:
                     this.blocks[1].centerOffset = [0,1]
                     this.blocks[2].centerOffset = [0,-1]
                     break
-                case 2:
+                case 1:
                     this.blocks[1].centerOffset = [1,0]
                     this.blocks[2].centerOffset = [-1,0]
                     break
-                case 3: 
+                case 2: 
                     this.blocks[1].centerOffset = [0,-1]
                     this.blocks[2].centerOffset = [0,1]
+                    break
+                case 3:
+                    this.blocks[1].centerOffset = [-1,0]
+                    this.blocks[2].centerOffset = [1,0]
                     break
             }
         } else { //shape is 'L'
@@ -221,11 +256,10 @@ class Piece {
     illegalPosition(){
         for (let block of this.blocks){
             let [y, x] = block.getAbsolutePosition()
-            if(this.grid[y][x] != 0){
+            if(this.grid?.[y]?.[x] != 0){
                 return true
             }
         }
-
         return false
     }
 
@@ -237,6 +271,10 @@ class Piece {
 
     hardDrop(){ //keeps moving down until dropped. Inputs should be blocked in transit, if transit time not 0
         console.log('piece being placed')
+
+        while(this.attemptTranslate('MOVEDOWN')){
+            //do nothing
+        }
         this.isActive = false
         this.blocks.forEach((block) => {
             console.log('attempting to place: ', block)
@@ -251,11 +289,18 @@ class Piece {
             this.grace -= 1
         }
     }
-
-    findGround(){ //used for shadow piece and harddrop. checks where the piece would land on hard drop
-        
+    
+    draw(){
+        this.blocks.forEach( (block) => {
+            block.draw()
+        })
     }
 
+    erase(){
+        this.blocks.forEach( (block) => {
+            block.erase()
+        })
+    }
 }
 
 class Board {
@@ -296,12 +341,7 @@ class Board {
     }
 
     update(action = 'MOVEDOWN'){
-        
-        this.curPiece.blocks.forEach( (block) => {
-            block.erase()
-        })
-
-
+        this.curPiece.erase()
         //could probably be easily cleaned up but this isn't that bad
         const actions = {
             'MOVEDOWN': () => {this.curPiece.attemptTranslate(action)},
@@ -317,9 +357,7 @@ class Board {
             },
         }
         actions[action]?.call(this)
-        this.curPiece.blocks.forEach( (block) => {
-            block.draw()
-        })
+        this.curPiece.draw()
     }
 
     blockDropped(piece){
