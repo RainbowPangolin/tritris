@@ -79,18 +79,47 @@ class Piece {
         this.blocks = [centerBlock, block2, block3]
     }
 
+    //returns true if rotation worked, false if failed
     attemptRotate(direction){
         //rotate, then check if blocks from current position
         //if blocks, unrotate
         //Note- this is probably a silly way to do rotation collision checks but it's requires less code for now
+        let initialOrientation = this.orientation
         this.rotate(direction)
+        let newOrientation = this.orientation 
 
         if (this.illegalPosition()) {
-            //any 4 rotations returns to original position
-            this.rotate(direction)
-            this.rotate(direction)
-            this.rotate(direction)
+            //attempt to kick
+            if(this.attemptKick(initialOrientation, newOrientation) == false){ //kick failed
+                //any 4 rotations returns to original position
+                this.rotate(direction)
+                this.rotate(direction)
+                this.rotate(direction)
+                return false
+            }
         } 
+        return true
+    }
+
+    //returns true if kick worked, false if failed
+    attemptKick(initialOrientation, newOrientation){
+        //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
+        //test1 was alrteady tried, so table contains test2, 3, 4, and 5
+        const kickTable = {
+            '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]]
+        }
+        let rotation = String([initialOrientation, newOrientation])
+
+        for (let coordinates of kickTable[rotation]){
+            if(this.attemptTranslate(coordinates)){
+                return true
+            }
+            console.log(rotation, coordinates)
+        }
+        
+
+        //attempt translation to every test point
+        return false
     }
 
     rotate(direction){
@@ -144,12 +173,16 @@ class Piece {
         }
     }
 
-    attemptTranslate(direction){
+    //Attempts to move piece in the specified direction/location, 'does nothing' if the move is illegal (OOB, collision)
+        //returns true if translation worked, false if failed
+    attemptTranslate(action){
         // console.log('asdf')
         let newPosition
         const lastPosition = this.centerPosition
         newPosition = structuredClone(lastPosition)
-        switch(direction){
+        switch(action){
+            case 'NONE':
+                break
             case 'MOVEDOWN':
                 newPosition[0] += 1
                 break
@@ -159,15 +192,20 @@ class Piece {
             case 'MOVERIGHT':
                 newPosition[1] += 1
                 break
+            default: //given relative coordinates, move to this location
+                newPosition[1] = newPosition[1] + action[1]
+                newPosition[0] = newPosition[0] + action[0]
+            //Maybe a default option for moving to a specific place if necessary
         }
         this.translate(newPosition)
 
-        console.log(this.illegalPosition())
+        // console.log(this.illegalPosition())
         if( this.illegalPosition() ){
             //undo move
             this.translate(lastPosition)
+            return false
         } 
-        
+        return true
     }
 
     translate(coords){ //translation on a plane- move left right or down 
