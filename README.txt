@@ -1,8 +1,11 @@
 TODO:
 
-Shadow pieces
-Redo kick table for 3 size pieces
+
+Preview 
+Hold piece
 Scoring
 Failing
 Local multiplayer
 Networked multiplayer
+Block appearance
+Redo kick table for 3 size pieces

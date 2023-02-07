@@ -9,10 +9,10 @@ class Block {
         this.centerOffset = [0,0] 
     }
 
-    draw(){
+    draw(color = this.options['color']){ //TODO- Find a better way of representing colors
         let [y,x] = this.getAbsolutePosition()
         const ctx = this.canvas.getContext("2d");
-        ctx.fillStyle = this.options['color'];
+        ctx.fillStyle = color;
         ctx.fillRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
     }
 
@@ -38,13 +38,13 @@ class Block {
 }
 
 class Piece {
-    constructor(shape, canvas, grid, blockSize, centerPosition){
+    constructor(shape, canvas, grid, blockSize, centerPosition, orientation = 0){
         this.shape = shape
         this.canvas = canvas
         this.grid = grid
         this.blockSize = blockSize
         this.centerPosition = centerPosition
-        this.orientation = 0 //4 positions, 0 1 2 3  
+        this.orientation = orientation //4 positions, 0 1 2 3  
         this.isActive = true
         this.grace = 5
         this.spawn(centerPosition)
@@ -58,31 +58,16 @@ class Piece {
         let centerBlock = new Block(this.canvas, this.grid, this.blockSize, [y,x])
         let block2 = new Block(this.canvas, this.grid, this.blockSize, [y,x])
         let block3 = new Block(this.canvas, this.grid, this.blockSize, [y,x])
-    
-        if(this.shape == 'I'){
-            centerBlock.centerOffset = [0,0]
-            block2.centerOffset = [0,1]
-            block3.centerOffset = [0,-1]
-        } else if (this.shape == 'L'){
-            centerBlock.centerOffset = [0,0]
-            block2.centerOffset = [-1,0]
-            block3.centerOffset = [0,1]
-        } else {
-            throw new Error("Illegal shape")
-        }
-
-        centerBlock.draw()
-        block2.draw()
-        block3.draw()
 
         this.blocks = [centerBlock, block2, block3]
+        this.setOffsets()
     }
 
-    showShadow(){
-        // this.shadowPiece.erase()
-        this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition)
+    showShadow(shadowColor){
+        this?.shadowPiece?.erase()
+        this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition, this.orientation)
         while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
-        this.shadowPiece.draw()
+        this.shadowPiece.draw(shadowColor)
     }
 
     //returns true if rotation worked, false if failed
@@ -159,17 +144,11 @@ class Piece {
         return false
     }
 
-    rotate(direction){
-        if(direction == 'ROTATERIGHT'){
-            this.orientation = (4 + (this.orientation + 1)) % 4 
-        } else if (direction == 'ROTATELEFT') {
-            this.orientation = (4 + (this.orientation - 1)) % 4 
-        } else if (direction == 'ROTATE180'){
-            this.orientation = (4 + (this.orientation + 2)) % 4 
-        }
-
+    //Takes changes block offsets(i.e. a piece's displayed shape and rotation0 based on this.orientation)
+    setOffsets(){
         //updates centerOffset of each block based on new orientation
-        if(this.shape == 'I') {
+        this.blocks[0].centerOffset = [0,0]
+        if(this.shape == '3I') {
             switch(this.orientation){
                 case 0:
                     this.blocks[1].centerOffset = [0,1]
@@ -188,7 +167,7 @@ class Piece {
                     this.blocks[2].centerOffset = [1,0]
                     break
             }
-        } else { //shape is 'L'
+        } else { //shape is '3L'
             switch(this.orientation){
                 case 0:
                     this.blocks[1].centerOffset = [-1,0]
@@ -208,6 +187,17 @@ class Piece {
                     break
             }
         }
+    }
+
+    rotate(direction){
+        if(direction == 'ROTATERIGHT'){
+            this.orientation = (4 + (this.orientation + 1)) % 4 
+        } else if (direction == 'ROTATELEFT') {
+            this.orientation = (4 + (this.orientation - 1)) % 4 
+        } else if (direction == 'ROTATE180'){
+            this.orientation = (4 + (this.orientation + 2)) % 4 
+        }
+        this.setOffsets()        
     }
 
     //Attempts to move piece in the specified direction/location, 'does nothing' if the move is illegal (OOB, collision)
@@ -292,9 +282,9 @@ class Piece {
         }
     }
     
-    draw(){
+    draw(color){
         this.blocks.forEach( (block) => {
-            block.draw()
+            block.draw(color)
         })
     }
 
@@ -302,6 +292,28 @@ class Piece {
         this.blocks.forEach( (block) => {
             block.erase()
         })
+    }
+
+    update(action){
+        this.erase()
+        //could probably be easily cleaned up but this isn't that bad
+        const actions = {
+            'NONE': () => {this.attemptTranslate(this.centerPosition)},
+            'MOVEDOWN': () => {this.attemptTranslate(action)},
+            'MOVELEFT': () => {this.attemptTranslate(action)},
+            'MOVERIGHT': () => {this.attemptTranslate(action)},
+
+            'ROTATERIGHT': () => {this.attemptRotate(action)},
+            'ROTATELEFT': () => {this.attemptRotate(action)},
+            'ROTATE180': () => {this.attemptRotate(action)},
+            'HARDDROP': () => {
+                this.hardDrop()
+                // this.addPiece('L')
+            },
+        }
+        actions[action]?.call(this)
+        this.draw()
+        this.showShadow('#AA7777')
     }
 }
 
@@ -340,27 +352,23 @@ class Board {
     addPiece(shape){
         let curPiece = new Piece(shape, this.canvas, this.grid, this.blockSize, [2, 4])
         this.curPiece = curPiece
+        this.curPiece.update('NONE')
     }
 
     update(action = 'MOVEDOWN'){
-        this.curPiece.erase()
-        //could probably be easily cleaned up but this isn't that bad
-        const actions = {
-            'MOVEDOWN': () => {this.curPiece.attemptTranslate(action)},
-            'MOVELEFT': () => {this.curPiece.attemptTranslate(action)},
-            'MOVERIGHT': () => {this.curPiece.attemptTranslate(action)},
-
-            'ROTATERIGHT': () => {this.curPiece.attemptRotate(action)},
-            'ROTATELEFT': () => {this.curPiece.attemptRotate(action)},
-            'ROTATE180': () => {this.curPiece.attemptRotate(action)},
-            'HARDDROP': () => {
-                this.curPiece.hardDrop()
-                this.addPiece('L')
-            },
+        this.curPiece.update(action)
+        if(action == 'HARDDROP'){
+            this.addPiece(this.nextPiece())
         }
-        actions[action]?.call(this)
-        this.curPiece.draw()
-        this.curPiece.showShadow()
+    }
+
+    nextPiece(curShape = this.curPiece.shape){
+        //TODO- Offer different bag types
+        if (curShape == '3L'){
+            return '3I'
+        } else if (curShape == '3I'){
+            return '3L'
+        }
     }
 
     blockDropped(){
@@ -372,11 +380,14 @@ class Board {
 
 }
 
-let newBoard = new Board()
+let playerBoard = new Board()
 
-newBoard.addPiece('I')
+// let preview = new Board(4,4)
 
-console.log(newBoard.grid)
+
+// playerBoard.addPiece('3I')
+
+console.log(playerBoard.grid)
 
 // setInterval(function () {
 //     newBoard.update()
@@ -386,22 +397,22 @@ console.log(newBoard.grid)
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'k':
-            newBoard.update('MOVEDOWN')
+            playerBoard.update('MOVEDOWN')
             break
         case 'l':
-            newBoard.update('MOVERIGHT')
+            playerBoard.update('MOVERIGHT')
             break
         case 'j':
-            newBoard.update('MOVELEFT')
+            playerBoard.update('MOVELEFT')
             break        
         case 'a':
-            newBoard.update('ROTATELEFT')
+            playerBoard.update('ROTATELEFT')
             break
         case 'd':
-            newBoard.update('ROTATERIGHT')
+            playerBoard.update('ROTATERIGHT')
             break
         case ' ':
-            newBoard.update('HARDDROP')
+            playerBoard.update('HARDDROP')
             
     }
     
