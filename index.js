@@ -68,7 +68,7 @@ class Piece {
             block2.centerOffset = [-1,0]
             block3.centerOffset = [0,1]
         } else {
-            throw new Error("Illegal shap")
+            throw new Error("Illegal shape")
         }
 
         centerBlock.draw()
@@ -78,10 +78,12 @@ class Piece {
         this.blocks = [centerBlock, block2, block3]
     }
 
-    // showShadow(){
-    //     this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition)
-    //     while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
-    // }
+    showShadow(){
+        // this.shadowPiece.erase()
+        this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition)
+        while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
+        this.shadowPiece.draw()
+    }
 
     //returns true if rotation worked, false if failed
     attemptRotate(direction){
@@ -358,9 +360,10 @@ class Board {
         }
         actions[action]?.call(this)
         this.curPiece.draw()
+        this.curPiece.showShadow()
     }
 
-    blockDropped(piece){
+    blockDropped(){
         if(!this.curPiece.isActive){
             return true
         }
