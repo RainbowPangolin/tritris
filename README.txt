@@ -1,7 +1,6 @@
 TODO:
-
-
-Preview 
+Refactor arguments to be less stupid
+ 
 Hold piece
 Scoring
 Failing

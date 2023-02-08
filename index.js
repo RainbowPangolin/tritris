@@ -38,7 +38,7 @@ class Block {
 }
 
 class Piece {
-    constructor(shape, canvas, grid, blockSize, centerPosition, orientation = 0){
+    constructor(shape, canvas, grid, blockSize, centerPosition, orientation = 0, shadowEnabled = true){
         this.shape = shape
         this.canvas = canvas
         this.grid = grid
@@ -48,6 +48,7 @@ class Piece {
         this.isActive = true
         this.grace = 5
         this.spawn(centerPosition)
+        this.shadowEnabled = shadowEnabled
     }
 
     spawn(coords){
@@ -313,7 +314,9 @@ class Piece {
         }
         actions[action]?.call(this)
         this.draw()
-        this.showShadow('#AA7777')
+        if(this.shadowEnabled){
+            this.showShadow('#AA7777') //TODO Change Color
+        }
     }
 }
 
@@ -326,7 +329,8 @@ class Board {
         canvas.height = BLOCK_SIZE*height //TODO make size modular
         this.canvas = canvas
         this.gravity = 1
-        document.body.append(canvas)
+        document.body.append(canvas) //TODO Return this canvas object instead of attaching to document in constructor
+        // this.mode = mode
 
         //create internal representaion of game state
         let grid = []
@@ -349,16 +353,18 @@ class Board {
         this.gravity = gravity
     }
     
-    addPiece(shape){
-        let curPiece = new Piece(shape, this.canvas, this.grid, this.blockSize, [2, 4])
+    addPiece(shape, location = [2, 4], shadowEnabled){
+        let curPiece = new Piece(shape, this.canvas, this.grid, this.blockSize, location, 0, shadowEnabled)
         this.curPiece = curPiece
         this.curPiece.update('NONE')
     }
 
     update(action = 'MOVEDOWN'){
         this.curPiece.update(action)
-        if(action == 'HARDDROP'){
+        if(action == 'HARDDROP'){ //TODO These if statements are inelegant
             this.addPiece(this.nextPiece())
+        } else if (action == 'HOLD'){
+            
         }
     }
 
@@ -378,14 +384,54 @@ class Board {
         return false
     }
 
+
+    
+
 }
 
-let playerBoard = new Board()
+class GameBoard extends Board {
+    constructor(width, height){
+        super(width, height)
+    } 
+    //emit event for piece being placed
+    //TODO Scoring
+}
 
-// let preview = new Board(4,4)
+class PreviewSquare extends Board {
+    constructor(width, height){ //TODO allow for single argument to determine square length
+        super(width, height)
+    }
+    showPiece(shape){
+        this?.curPiece?.erase()
+        this.addPiece(shape, [2,1], false) //Location is ???
+    }
+}
+
+let playerBoard = new GameBoard()
+
+// let preview = new PreviewSquare(4, 4)
+const previewWindow = {
+    'previewArray': [],
+
+    updatePieces(){
+        let nextPiece = playerBoard.nextPiece() //TODO Make this a non singleton?
+        this.previewArray.forEach( (previewSquare) => {
+            previewSquare.showPiece(nextPiece)
+            nextPiece = playerBoard.nextPiece(nextPiece)
+        })
+    }
+}
+
+for (let i = 0 ; i < 3; i++){
+    previewWindow.previewArray.push(new PreviewSquare(4, 4))
+}
 
 
-// playerBoard.addPiece('3I')
+
+playerBoard.addPiece('3I')
+
+previewWindow.updatePieces()
+
 
 console.log(playerBoard.grid)
 
@@ -411,8 +457,12 @@ document.addEventListener("keydown", (event) => {
         case 'd':
             playerBoard.update('ROTATERIGHT')
             break
+        case 'i':
+            playerBoard.update('HOLD')
+            break
         case ' ':
             playerBoard.update('HARDDROP')
+            break
             
     }
     
