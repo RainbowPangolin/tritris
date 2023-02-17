@@ -1,5 +1,5 @@
 export class Block {
-    constructor(canvas, grid, blockSize, position, options = {'color':"#FF0000"}){
+    constructor(canvas, grid, blockSize, position, options = {'color':"#DD95DD"}){
         this.canvas = canvas
         this.grid = grid
         this.blockSize = blockSize
@@ -9,20 +9,19 @@ export class Block {
         this.centerOffset = [0,0] 
     }
 
-    draw(color = this.options['color']){ //TODO- Find a better way of representing colors
+    draw(color = this.options['color'], selectedCanvas = this.canvas){ //TODO- Find a better way of representing colors
         let [y,x] = this.getAbsolutePosition()
-        const ctx = this.canvas.getContext("2d");
+        const ctx = selectedCanvas.getContext("2d");
+        ctx.fillStyle = 'black';
+        ctx.fillRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);        
         ctx.fillStyle = color;
-        ctx.fillRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
-        // ctx.strokeStyle = "black";
-        // ctx.strokeRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
+        ctx.fillRect(x * this.blockSize + 1, y * this.blockSize + 1, this.blockSize -  2, this.blockSize - 2);
     }
 
-    erase(){ //removes block, does not affect logic
+    erase(selectedCanvas = this.canvas){ //removes block, does not affect logic
         let [y,x] = this.getAbsolutePosition()
-        const ctx = this.canvas.getContext("2d");
+        const ctx = selectedCanvas.getContext("2d");
         ctx.clearRect(x * this.blockSize, y * this.blockSize, this.blockSize , this.blockSize);
-        // ctx.clearStroke(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);
     }
 
     place(){ //places block in current, final position

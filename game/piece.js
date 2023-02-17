@@ -175,6 +175,8 @@ const PIECES = {
 
 let v
 const KICK_TABLE = {
+    //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
+
     'L': (v = {
         '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]],
         '1,0': [[0, 1], [-1, 1], [2, 0], [2,1]],
@@ -225,9 +227,10 @@ const KICK_TABLE = {
 
 
 export class Piece {
-    constructor(shape, canvas, grid, blockSize, centerPosition, orientation = 0, shadowEnabled = true){
+    constructor(shape, canvas, grid, blockSize, centerPosition, orientation = 0, shadowEnabled = true, debugCanvas, options = {}){
         this.shape = shape
         this.canvas = canvas
+        this.debugCanvas = debugCanvas
         this.grid = grid
         this.blockSize = blockSize
         this.centerPosition = centerPosition
@@ -254,7 +257,7 @@ export class Piece {
 
     showShadow(shadowColor){
         this?.shadowPiece?.erase()
-        this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition, this.orientation)
+        this.shadowPiece = new Piece(this.shape, this.canvas, this.grid, this.blockSize, this.centerPosition, this.orientation, this.debugCanvas)
         while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
         this.shadowPiece.draw(shadowColor)
     }
@@ -283,52 +286,13 @@ export class Piece {
 
     //returns true if kick worked, false if failed
     attemptKick(initialOrientation, newOrientation){
-        //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
-        //test1 was alrteady tried, so table contains test2, 3, 4, and 5
-        // {
-        //     let v
-        //     var kickTable = {
-        //         'L': (v = {
-        //             '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]],
-        //             '1,0': [[0, 1], [-1, 1], [2, 0], [2,1]],
-        //             '1,2': [[0,1], [-1, 1], [2,0], [2,1]],
-        //             '2,1': [[0,-1], [1, -1], [-2,0], [-2,-1]],
-        //             '2,3': [[0,1], [1,1], [-2,0], [-2,1]],
-        //             '3,2': [[0,-1], [-1,-1], [2,0], [2,-1]],
-        //             '3,0': [[0,-1], [-1,-1], [2,0], [2,-1]],
-        //             '0,3': [[0,1], [1,1], [-2,0], [-2, 1]]
-        //         }),
-        //         'J': v,
-        //         'I': {
-        //             '0,1': [[0, -1], [1, -1], [-2, 0], [-2, -1]],
-        //             '1,0': [[0, 1], [-1, 1], [2, 0], [2,1]],
-        //             '1,2': [[0,1], [-1, 1], [2,0], [2,1]],
-        //             '2,1': [[0,-1], [1, -1], [-2,0], [-2,-1]],
-        //             '2,3': [[0,1], [1,1], [-2,0], [-2,1]],
-        //             '3,2': [[0,-1], [-1,-1], [2,0], [2,-1]],
-        //             '3,0': [[0,-1], [-1,-1], [2,0], [2,-1]],
-        //             '0,3': [[0,1], [1,1], [-2,0], [-2, 1]]
-        //         },
-        //         '3I': { // adjusted for 3 long I piece
-        //             '0,1': [[0, -2], [0, 1], [-1, -2], [2, 1]],
-        //             '1,0': [[0, 2], [0, -1], [1, 2], [-2,-1]],
-        //             '1,2': [[0,-1], [0, 2], [2,-1], [-1,2]],
-        //             '2,1': [[0,1], [0, -2], [-2,1], [1,-2]],
-        //             '2,3': [[0,2], [0,-1], [1,2], [-2,-1]],
-        //             '3,2': [[0,-2], [0,1], [-1,-2], [2,1]],
-        //             '3,0': [[0,1], [0,-2], [-2,1], [1,-2]],
-        //             '0,3': [[0,-1], [0,2], [2,-1], [-1,2]]
-        //         }
-                
-        //     }
-        // }
+        
         let kickTable = KICK_TABLE
         let rotation = String([initialOrientation, newOrientation])
 
         for (let coordinates of kickTable[this.shape][rotation]){
             console.log(rotation, coordinates)
-
-            if(this.attemptTranslate(coordinates)){
+            if(this.attemptTranslate(coordinates, true)){
                 return true
             }
         }
@@ -378,7 +342,7 @@ export class Piece {
 
     //Attempts to move piece in the specified direction/location, 'does nothing' if the move is illegal (OOB, collision)
         //returns true if translation worked, false if failed
-    attemptTranslate(action){
+    attemptTranslate(action, fromKick = false){
         // console.log('asdf')
         let newPosition
         const lastPosition = this.centerPosition
@@ -400,11 +364,15 @@ export class Piece {
                 newPosition[0] = newPosition[0] + action[0]
             //Maybe a default option for moving to a specific place if necessary
         }
+        
         this.translate(newPosition)
-
-        // console.log(this.illegalPosition())
+        if(fromKick){
+            this.draw('green', this.debugCanvas)
+            debugger
+            this.erase(this.debugCanvas)
+        }
         if( this.illegalPosition() ){
-            //undo move
+
             this.translate(lastPosition)
             return false
         } 
@@ -424,7 +392,11 @@ export class Piece {
     illegalPosition(){
         for (let block of this.blocks){
             let [y, x] = block.getAbsolutePosition()
-            if(this.grid?.[y]?.[x] != 0){
+            let gridSpot = this.grid?.[y]?.[x]
+            if(gridSpot != 0){
+                //TODO breakpoint feature?
+                // block.draw('green')
+                // block.erase()
                 return true
             }
         }
@@ -458,15 +430,15 @@ export class Piece {
         }
     }
     
-    draw(color){
+    draw(color, selectedCanvas){
         this.blocks.forEach( (block) => {
-            block.draw(color)
+            block.draw(color, selectedCanvas)
         })
     }
 
-    erase(){
+    erase(selectedCanvas){
         this.blocks.forEach( (block) => {
-            block.erase()
+            block.erase(selectedCanvas)
         })
     }
 

@@ -5,11 +5,19 @@ export class Board {
         const BLOCK_SIZE = 25
         this.blockSize = BLOCK_SIZE
         let canvas = document.createElement("canvas");
+        let debugCanvas = document.createElement("canvas");
+        // debugCanvas.classList.add('debug')
+        // canvas.classList.add('mainBoard')
         canvas.width = BLOCK_SIZE*width //TODO make size modular
-        canvas.height = BLOCK_SIZE*height //TODO make size modular
+        canvas.height = BLOCK_SIZE*height        
+        debugCanvas.width = BLOCK_SIZE*width 
+        debugCanvas.height = BLOCK_SIZE*height 
+        this.debugCanvas = debugCanvas
         this.canvas = canvas
         this.gravity = 1
+
         document.body.append(canvas) //TODO Return this canvas object instead of attaching to document in constructor
+        document.body.append(debugCanvas)
         // this.mode = mode
 
         //create internal representaion of game state
@@ -33,8 +41,8 @@ export class Board {
         this.gravity = gravity
     }
     
-    addPiece(shape, location = [2, 4], shadowEnabled){
-        let curPiece = new Piece(shape, this.canvas, this.grid, this.blockSize, location, 0, shadowEnabled)
+    addPiece(shape, location = [2, 4], shadowEnabled = false){
+        let curPiece = new Piece(shape, this.canvas, this.grid, this.blockSize, location, 0, shadowEnabled, this.debugCanvas, {'debugCanvas': this.debugCanvas})
         this.curPiece = curPiece
         this.curPiece.update('NONE')
     }

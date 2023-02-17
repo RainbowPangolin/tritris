@@ -15,9 +15,9 @@ const previewWindow = {
     }
 }
 
-for (let i = 0 ; i < 3; i++){
-    previewWindow.previewArray.push(new PreviewSquare(4, 4))
-}
+// for (let i = 0 ; i < 3; i++){
+//     previewWindow.previewArray.push(new PreviewSquare(4, 4))
+// }
 
 
 
