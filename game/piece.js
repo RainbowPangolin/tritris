@@ -54,7 +54,7 @@ const PIECES = {
         //position 4
         [[1, 0, 0],
          [1, 1, 0],
-         [0, 0, 1],], 
+         [0, 1, 0],], 
     ],
     'Z': [
         //position 1
@@ -138,6 +138,16 @@ const PIECES = {
     ]
 }
 
+const PIECE_COLOR_MAP = {
+    "J": 'blue',
+    "L": 'orange',
+    "S": 'limegreen',
+    "Z": 'red',
+    "T": 'magenta',
+    "I": 'aqua',
+    "O": 'yellow'
+}
+
 let u, v
 const KICK_TABLE = {
     //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
@@ -181,6 +191,9 @@ const KICK_TABLE = {
 
 }
 
+function getColorOfPiece(shape){
+    return PIECE_COLOR_MAP[shape]
+}
 
 export class Piece {
     constructor({
@@ -219,7 +232,8 @@ export class Piece {
                     canvas: this.minoBoardCanvas, 
                     grid: this.gameStateGrid, 
                     blockSize: this.blockSize, 
-                    positionOfCenterBlock: [y,x]
+                    positionOfCenterBlock: [y,x],
+                    color: getColorOfPiece(this.shape)
                 })
             )
         }
@@ -250,7 +264,7 @@ export class Piece {
         return offsets
     }
 
-    updateShadow(shadowColor){
+    updateShadow(){
         this?.shadowPiece?.erase()
         this.shadowPiece = new Piece({
             shape: this.shape, 
@@ -262,7 +276,14 @@ export class Piece {
             orientation: this.orientation 
             })
         while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
-        this.shadowPiece.draw(shadowColor)
+        this.shadowPiece.setPieceColorTo('lightgray')
+        this.shadowPiece.draw()
+    }
+
+    setPieceColorTo(color){
+        this.blocksList.forEach((block) => {
+            block.color = color
+        })
     }
 
     //returns true if rotation worked, false if failed
@@ -400,7 +421,7 @@ export class Piece {
         }
     }
     
-    draw({color = 'red', selectedCanvas = this.minoBoardCanvas} = {}){
+    draw({color, selectedCanvas = this.minoBoardCanvas} = {}){
         this.blocksList.forEach( (block) => {
             block.draw(color, selectedCanvas)
         })
@@ -433,7 +454,7 @@ export class Piece {
 
         //TODO Find a way to show shadow without calling the method here
         if(this.shadowEnabled){
-            this.updateShadow('#AA7777') //TODO Change Color
+            this.updateShadow() //TODO Change Color
         }
 
         this.draw()

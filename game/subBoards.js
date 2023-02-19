@@ -2,8 +2,8 @@ import {Board} from './board.js'
 
 
 export class GameBoard extends Board {
-    constructor(width, height){
-        super(width, height)
+    constructor({width, height, domDocument}){
+        super({width, height, domDocument})
         this.debugCanvas.classList.add('debugCanvas')
         this.minoBoardCanvas.classList.add('mainCanvas')
 

@@ -20,15 +20,6 @@ const previewWindow = {
     }
 }
 
-// for (let i = 0 ; i < 3; i++){
-//     previewWindow.previewArray.push(new PreviewSquare(4, 4))
-// }
-
-// setInterval(function () {
-//     newBoard.receiveInput()
-//     console.log('translated')
-// }, 1000);
-
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'k':
@@ -45,6 +36,9 @@ document.addEventListener("keydown", (event) => {
             break
         case 'd':
             playerBoard.receiveInput('ROTATERIGHT')
+            break
+        case 'w':
+            playerBoard.receiveInput('ROTATE180')
             break
         case 'i':
             playerBoard.receiveInput('HOLD')

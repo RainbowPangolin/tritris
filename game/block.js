@@ -4,19 +4,19 @@ export class Block {
         grid, 
         blockSize,
         positionOfCenterBlock, 
-        options = {'color':"#DD95DD"}}
+        color}
         ){
 
         this.canvas = canvas
         this.grid = grid
         this.blockSize = blockSize
         this.positionOfCenterBlock = positionOfCenterBlock
-        this.options = options
+        this.color = color
         this.isActive = true
         this.centerOffset = [0,0] 
     }
 
-    draw({color = this.options['color'], selectedCanvas = this.canvas} = {}){ //TODO- Find a better way of representing colors
+    draw({color = this.color, selectedCanvas = this.canvas} = {}){ //TODO- Find a better way of representing colors
         let [y,x] = this.getAbsolutePosition()
         const ctx = selectedCanvas.getContext("2d");
         ctx.fillStyle = 'black';
