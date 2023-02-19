@@ -8,6 +8,8 @@ let playerBoard = new GameBoard({
 
 playerBoard.startGame()
 
+
+console.log(playerBoard.shadowPiece.color)
 const previewWindow = {
     'previewArray': [],
 

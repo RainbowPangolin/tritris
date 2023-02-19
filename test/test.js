@@ -37,12 +37,28 @@ describe('Bag system', function () {
       height: 22,
       domDocument: dom.window.document
     })
-    let testBag = new Set()
     let firstShape = board.getUpcomingShape()
     board.startGame()
 
-    assert.equal(board.curPiece.shape, firstShape, 'First shape was not gotten from bag')
+    assert.equal(board.activePiece.shape, firstShape, 'First shape was not gotten from bag')
 
   })
 
 });
+
+describe('Shadowpiece color', function () {
+  it("should be different from the parent piece's color", function () {
+    const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+    let board = new GameBoard({
+      width: 9,
+      height: 22,
+      domDocument: dom.window.document
+    })
+    board.startGame()
+
+    let activePiece = board.activePiece
+    let shadowPiece = board.shadowPiece
+    assert.notEqual(activePiece.color, shadowPiece.color, 'Piece colors are the same (should be different)')
+
+  })
+})

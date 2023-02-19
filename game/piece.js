@@ -151,8 +151,8 @@ const PIECE_COLOR_MAP = {
 let u, v
 const KICK_TABLE = {
     //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
+    //TODO Flesh out 180 kick table (probably based on TETR.IO kick table)
     'L': (v = {
-
         '0,1': [[0, -1], [-1, -1], [2, 0], [2, -1]],
         '1,0': [[0, 1], [1, 1], [-2, 0], [-2,1]],
         '1,2': [[0,1], [1, 1], [-2,0], [-2,1]],
@@ -160,7 +160,13 @@ const KICK_TABLE = {
         '2,3': [[0,1], [-1,1], [2,0], [2,1]],
         '3,2': [[0,-1], [1,-1], [-2,0], [-2,-1]],
         '3,0': [[0,-1], [1,-1], [-2,0], [-2,-1]],
-        '0,3': [[0,1], [-1,1], [2,0], [2, 1]]
+        '0,3': [[0,1], [-1,1], [2,0], [2, 1]],
+        '0,2': [[0, 0]],
+        '2,0': [[0, 0]],
+        '1,3': [[0, 0]],
+        '3,1': [[0, 0]],
+
+        
     }),
     'J': v,
     'S': v,
@@ -175,7 +181,11 @@ const KICK_TABLE = {
         '2,3': [[0,1], [-1,1], [2,0], [2,1]],
         '3,2': [[0,-1], [1,-1], [-2,0], [-2,-1]],
         '3,0': [[0,-1], [1,-1], [-2,0], [-2,-1]],
-        '0,3': [[0,1], [-1,1], [2,0], [2, 1]]
+        '0,3': [[0,1], [-1,1], [2,0], [2, 1]],
+        '0,2': [[0, 0]],
+        '2,0': [[0, 0]],
+        '1,3': [[0, 0]],
+        '3,1': [[0, 0]],
     }),
     '3I': u,
     'O': {
@@ -187,11 +197,15 @@ const KICK_TABLE = {
         '3,2': [[0, 0]],
         '3,0': [[0, 0]],
         '0,3': [[0, 0]],
+        '0,2': [[0, 0]],
+        '2,0': [[0, 0]],
+        '1,3': [[0, 0]],
+        '3,1': [[0, 0]],
     },
 
 }
 
-function getColorOfPiece(shape){
+function getDefaultColorOfPiece(shape){
     return PIECE_COLOR_MAP[shape]
 }
 
@@ -221,6 +235,16 @@ export class Piece {
         this.spawn(positionOfCenterBlock)
     }
 
+    get color(){
+        return this.blocksList[0].color
+    }
+
+    set color(color){
+        this.blocksList.forEach((block) => {
+            block.color = color
+        })
+    }
+
     spawn(coords){
         let y = coords[0]
         let x = coords[1]
@@ -233,7 +257,7 @@ export class Piece {
                     grid: this.gameStateGrid, 
                     blockSize: this.blockSize, 
                     positionOfCenterBlock: [y,x],
-                    color: getColorOfPiece(this.shape)
+                    color: getDefaultColorOfPiece(this.shape)
                 })
             )
         }
@@ -265,8 +289,8 @@ export class Piece {
     }
 
     updateShadow(){
-        this?.shadowPiece?.erase()
-        this.shadowPiece = new Piece({
+        this?.shadow?.erase()
+        this.shadow = new Piece({
             shape: this.shape, 
             minoBoardCanvas: this.minoBoardCanvas, 
             debugCanvas: this.debugCanvas,
@@ -275,16 +299,12 @@ export class Piece {
             positionOfCenterBlock: this.positionOfCenterBlock, 
             orientation: this.orientation 
             })
-        while(this.shadowPiece.attemptTranslate('MOVEDOWN')) {}
-        this.shadowPiece.setPieceColorTo('lightgray')
-        this.shadowPiece.draw()
+        while(this.shadow.attemptTranslate('MOVEDOWN')) {}
+        this.shadow.color = 'lightgray'
+        this.shadow.draw()
     }
 
-    setPieceColorTo(color){
-        this.blocksList.forEach((block) => {
-            block.color = color
-        })
-    }
+    
 
     //returns true if rotation worked, false if failed
     //TODO Refactor to throw exception that gets handled instead of just returning true/false
@@ -312,8 +332,10 @@ export class Piece {
             this.orientation = (4 + (this.orientation + 1)) % 4 
         } else if (direction == 'ROTATELEFT') {
             this.orientation = (4 + (this.orientation - 1)) % 4 
-        } else if (direction == 'ROTATE180'){
-            this.orientation = (4 + (this.orientation + 2)) % 4 
+        } else if (direction == 'ROTATE180') {
+            this.orientation = (4 + (this.orientation - 2)) % 4 
+        } else {
+            throw new Error('Illegal rotation attempted')
         }
         this.applyBlockOffsets()        
     }
@@ -447,7 +469,6 @@ export class Piece {
             'ROTATE180': () => {this.attemptRotate(action)},
             'HARDDROP': () => {
                 this.hardDrop()
-                // this.addPiece('L')
             },
         }
         actions[action]?.call(this)

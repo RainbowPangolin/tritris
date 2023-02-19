@@ -80,7 +80,7 @@ export class Board {
     }
     
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
-        let curPiece = new Piece({
+        let activePiece = new Piece({
             shape: shape, 
             minoBoardCanvas: this.minoBoardCanvas, 
             debugCanvas: this.debugCanvas,
@@ -90,12 +90,12 @@ export class Board {
             orientation: 0, 
             shadowEnabled: this.shadowEnabled,  
         })
-        this.curPiece = curPiece
-        this.curPiece.performAction('SPAWN')
+        this.activePiece = activePiece
+        this.activePiece.performAction('SPAWN')
     }
 
     receiveInput(action = 'MOVEDOWN'){
-        this.curPiece.performAction(action)
+        this.activePiece.performAction(action)
         if(action == 'HARDDROP'){ //TODO These if statements are inelegant, and more functionality is down in Piece.js
             this.placePiece()
         } else if (action == 'HOLD'){
@@ -122,13 +122,14 @@ export class Board {
     }
 
     blockDropped(){
-        if(!this.curPiece.isActive){
+        if(!this.activePiece.isActive){
             return true
         }
         return false
     }
 
-
-    
+    get shadowPiece(){
+        return this.activePiece.shadow
+    }
 
 }
