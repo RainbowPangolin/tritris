@@ -12,9 +12,9 @@ export class Board {
         gravity = 1,
         shadowEnabled = true,
         previewSize = 5,
-        pieceQueue = []
+        shapeQueue = []
     } = {}){ 
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue})
+        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, shapeQueue})
         this.createGameStateGrid()
         this.initializeGameSettings()
         this.initializeCanvasDisplay()
@@ -60,9 +60,9 @@ export class Board {
     }
 
     addRequiredBags(){
-        while(this.previewSize > this.pieceQueue.length){
+        while(this.previewSize > this.shapeQueue.length){
             let newBag = this.getNewBag()
-            this.pieceQueue.push(...newBag)
+            this.shapeQueue.push(...newBag)
         }
     }
 
@@ -71,7 +71,7 @@ export class Board {
     }
 
     startGame(){
-        this.addPiece(this.getUpcomingPiece())
+        this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeUpcomingPieceFromQueue()
     }
 
@@ -79,7 +79,7 @@ export class Board {
         this.gravity = gravity
     }
     
-    addPiece(shape, location = [2, 4]){
+    insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
         let curPiece = new Piece({
             shape: shape, 
             minoBoardCanvas: this.minoBoardCanvas, 
@@ -104,7 +104,7 @@ export class Board {
     }
 
     placePiece(){
-        this.addPiece(this.getUpcomingPiece())
+        this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeUpcomingPieceFromQueue()
     }
 
@@ -113,13 +113,12 @@ export class Board {
     }
 
     removeUpcomingPieceFromQueue(stepsAhead = 0){
-        this.pieceQueue.shift() //...
+        this.shapeQueue.shift() //...
         this.addRequiredBags()
     }
 
-    getUpcomingPiece(stepsAhead = 0){
-        //TODO- Offer different bag types
-        return this.pieceQueue[stepsAhead]
+    getUpcomingShape(stepsAhead = 0){
+        return this.shapeQueue[stepsAhead]
     }
 
     blockDropped(){
