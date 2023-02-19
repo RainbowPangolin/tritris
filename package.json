@@ -1,6 +1,7 @@
 {
+  "type": "module",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha -r jsdom-global/register"
   },
   "dependencies": {
     "mocha": "^10.2.0"

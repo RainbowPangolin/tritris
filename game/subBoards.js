@@ -5,7 +5,7 @@ export class GameBoard extends Board {
     constructor(width, height){
         super(width, height)
         this.debugCanvas.classList.add('debugCanvas')
-        this.canvas.classList.add('mainCanvas')
+        this.minoBoardCanvas.classList.add('mainCanvas')
 
     } 
     //emit event for piece being placed

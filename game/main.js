@@ -1,8 +1,13 @@
-import {GameBoard, PreviewSquare} from './subBoards.js'
+import {GameBoard} from './subBoards.js'
 
-let playerBoard = new GameBoard()
+let playerBoard = new GameBoard({
+    width: 9,
+    height: 22,
+    domDocument: document
+})
 
-// let preview = new PreviewSquare(4, 4)
+playerBoard.startGame()
+
 const previewWindow = {
     'previewArray': [],
 
@@ -19,42 +24,33 @@ const previewWindow = {
 //     previewWindow.previewArray.push(new PreviewSquare(4, 4))
 // }
 
-
-
-playerBoard.addPiece('I')
-
-previewWindow.updatePieces()
-
-
-console.log(playerBoard.grid)
-
 // setInterval(function () {
-//     newBoard.update()
+//     newBoard.receiveInput()
 //     console.log('translated')
 // }, 1000);
 
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'k':
-            playerBoard.update('MOVEDOWN')
+            playerBoard.receiveInput('MOVEDOWN')
             break
         case 'l':
-            playerBoard.update('MOVERIGHT')
+            playerBoard.receiveInput('MOVERIGHT')
             break
         case 'j':
-            playerBoard.update('MOVELEFT')
+            playerBoard.receiveInput('MOVELEFT')
             break        
         case 'a':
-            playerBoard.update('ROTATELEFT')
+            playerBoard.receiveInput('ROTATELEFT')
             break
         case 'd':
-            playerBoard.update('ROTATERIGHT')
+            playerBoard.receiveInput('ROTATERIGHT')
             break
         case 'i':
-            playerBoard.update('HOLD')
+            playerBoard.receiveInput('HOLD')
             break
         case ' ':
-            playerBoard.update('HARDDROP')
+            playerBoard.receiveInput('HARDDROP')
             break
             
     }
