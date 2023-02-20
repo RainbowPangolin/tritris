@@ -54,19 +54,6 @@ export class Board {
         this.activeMinoBoardCanvas.classList.add('mainCanvas')
         this.debugCanvas.classList.add('debug')
 
-        // let placedMinoBoardCanvas = this.domDocument.createElement("canvas");
-        // placedMinoBoardCanvas.classList.add('mainBoard')
-        // placedMinoBoardCanvas.width = this.blockSize*this.width //TODO make size modular
-        // placedMinoBoardCanvas.height = this.blockSize*this.height   
-        // this.placedMinoBoardCanvas = placedMinoBoardCanvas
-
-        // let activeMinoBoardCanvas = this.domDocument.createElement("canvas");
-        // let debugCanvas = this.domDocument.createElement("canvas");
-        // debugCanvas.classList.add('debug')
-        // debugCanvas.width = this.blockSize*this.width 
-        // debugCanvas.height = this.blockSize*this.height 
-        // this.debugCanvas = debugCanvas
-
         this.domDocument.body.append(this.placedMinoBoardCanvas) 
         this.domDocument.body.append(this.debugCanvas)
         this.domDocument.body.append(this.activeMinoBoardCanvas)
@@ -75,7 +62,7 @@ export class Board {
     //TODO All this is garbage still, I shoudl abstract it into a new object or interface
     getNewCanvas(){
         let newCanvas = this.domDocument.createElement("canvas");
-        newCanvas.width = this.blockSize*this.width //TODO make size modular
+        newCanvas.width = this.blockSize*this.width 
         newCanvas.height = this.blockSize*this.height   
         return newCanvas
     }
@@ -117,11 +104,15 @@ export class Board {
             spawnPoint: this.spawnPoint
         })
         this.activePiece = activePiece
-        // this.activePiece.spawn()
         this.activePiece.performAction('SPAWN')
     }
     
     //TODO Write method that takes an array of actions and keeps doing receiveInput for testing
+    receiveTheArrayOfInputs(array){
+        array.forEach((action) => {
+            this.receiveInput(action)
+        })
+    }
 
     receiveInput(action = 'MOVEDOWN'){
         this.activePiece.performAction(action)
@@ -130,7 +121,7 @@ export class Board {
         } else if (action == 'HOLD'){
             this.swapHeldAndActivePieces()
         }
-        // this.refreshDisplay()
+        //TODO this.refreshDisplay()???
     }
 
     placePiece(){ //TODO Rename, this is an incorrect name

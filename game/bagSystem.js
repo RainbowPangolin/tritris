@@ -1,4 +1,3 @@
-
 export function generateNewBagUsing(bagSystem){
     if (Array.isArray(bagSystem)){
         let newBag = structuredClone(bagSystem)

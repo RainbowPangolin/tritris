@@ -151,7 +151,7 @@ const PIECE_COLOR_MAP = {
 let u, v 
 const KICK_TABLE = {
     //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
-    //TODO Flesh out 180 kick table (probably based on TETR.IO kick table)
+    //180 kicks based on TETR.IO kick table
     // https://pbs.twimg.com/media/EaWH8QgXgAArDEV?format=png&name=large
     'L': (v = {
         '0,1': [[0, -1], [-1, -1], [2, 0], [2, -1]],
@@ -162,10 +162,10 @@ const KICK_TABLE = {
         '3,2': [[0,-1], [1,-1], [-2,0], [-2,-1]],
         '3,0': [[0,-1], [1,-1], [-2,0], [-2,-1]],
         '0,3': [[0,1], [-1,1], [2,0], [2, 1]],
-        '0,2': [[0, 0]],
-        '2,0': [[0, 0]],
-        '1,3': [[0, 0]],
-        '3,1': [[0, 0]],
+        '0,2': [[-1, 0], [-1,1], [1,1], [0,1], [0,-1],],
+        '2,0': [[1,0], [1, -1], [1, 1], [0, -1], [0,1]],
+        '1,3': [[0, 1], [-2, 1], [-1, 1], [-2, 0], [-1,0]],
+        '3,1': [[0, -1], [-2, -1], [-1,-1], [-2, 0], [-1,0]],
 
         
     }),

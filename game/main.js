@@ -9,20 +9,6 @@ let playerBoard = new GameBoard({
 
 playerBoard.startGame()
 
-
-console.log(playerBoard.shadowPiece.color)
-const previewWindow = {
-    'previewArray': [],
-
-    updatePieces(){
-        let nextPiece = playerBoard.nextPiece() //TODO Make this a non singleton?
-        this.previewArray.forEach( (previewSquare) => {
-            previewSquare.showPiece(nextPiece)
-            nextPiece = playerBoard.nextPiece(nextPiece)
-        })
-    }
-}
-
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'k':
