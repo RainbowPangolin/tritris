@@ -148,10 +148,11 @@ const PIECE_COLOR_MAP = {
     "O": 'yellow'
 }
 
-let u, v
+let u, v 
 const KICK_TABLE = {
     //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
     //TODO Flesh out 180 kick table (probably based on TETR.IO kick table)
+    // https://pbs.twimg.com/media/EaWH8QgXgAArDEV?format=png&name=large
     'L': (v = {
         '0,1': [[0, -1], [-1, -1], [2, 0], [2, -1]],
         '1,0': [[0, 1], [1, 1], [-2, 0], [-2,1]],
@@ -212,48 +213,36 @@ function getDefaultColorOfPiece(shape){
 export class Piece {
     constructor({
         shape,
-        minoBoardCanvas,
+        activeCanvas,
         gameStateGrid,
-        debugCanvas,
         blockSize, 
         positionOfCenterBlock, 
         orientation, 
         shadowEnabled,
+        availableCanvases,
+        spawnPoint,
     }){
-        this.shape = shape
-        this.minoBoardCanvas = minoBoardCanvas
-        this.debugCanvas = debugCanvas
-        this.gameStateGrid = gameStateGrid
-        this.blockSize = blockSize
-        this.positionOfCenterBlock = positionOfCenterBlock
-        this.orientation = orientation //4 positions, 0 1 2 3  
+        this.blocksList = []
+        Object.assign(this, {shape, activeCanvas, gameStateGrid, blockSize, positionOfCenterBlock, orientation, shadowEnabled, availableCanvases, spawnPoint})
+        this.spawnBlocks()
+        //TODO super inelegant, but I can't think of a better solution right now
+        this.activeCanvas = activeCanvas
+
         this.shadowEnabled = shadowEnabled
         this.isActive = true
         /// TODO Grace system
         this.grace = 5
 
-        this.spawn(positionOfCenterBlock)
     }
 
-    get color(){
-        return this.blocksList[0].color
-    }
-
-    set color(color){
-        this.blocksList.forEach((block) => {
-            block.color = color
-        })
-    }
-
-    spawn(coords){
-        let y = coords[0]
-        let x = coords[1]
+    spawnBlocks(){
+        let y = this.spawnPoint[0]
+        let x = this.spawnPoint[1]
         this.positionOfCenterBlock = [y, x]
-        this.blocksList = []
         for (let i = 0; i < 4; i++){
             this.blocksList.push(
                 new Block({
-                    canvas: this.minoBoardCanvas, 
+                    canvas: this.activeCanvas, 
                     grid: this.gameStateGrid, 
                     blockSize: this.blockSize, 
                     positionOfCenterBlock: [y,x],
@@ -263,6 +252,31 @@ export class Piece {
         }
         this.applyBlockOffsets()
     }
+
+    set activeCanvas(activeCanvas){
+        this._activeCanvas = activeCanvas
+        this.blocksList.forEach((block) => {
+            block.activeCanvas = activeCanvas
+        })
+    }
+
+    get activeCanvas(){
+        return this._activeCanvas
+    }
+
+    get color(){
+        return this.blocksList[0].color
+    }
+
+    set color(color){ //redundant method but /shrug
+        this._color = color
+        this.blocksList.forEach((block) => {
+            block.color = color
+        })
+    }
+
+
+
 
     applyBlockOffsets(){
         this.blocksList[0].centerOffset = [0,0]
@@ -288,16 +302,17 @@ export class Piece {
         return offsets
     }
 
+    //TODO- Abstract Piece into an Active piece type and a Shadow piece type.
     updateShadow(){
         this?.shadow?.erase()
         this.shadow = new Piece({
             shape: this.shape, 
-            minoBoardCanvas: this.minoBoardCanvas, 
-            debugCanvas: this.debugCanvas,
+            activeCanvas: this.activeCanvas, 
             gameStateGrid: this.gameStateGrid, 
             blockSize: this.blockSize, 
             positionOfCenterBlock: this.positionOfCenterBlock, 
-            orientation: this.orientation 
+            orientation: this.orientation,
+            spawnPoint: this.spawnPoint
             })
         while(this.shadow.attemptTranslate('MOVEDOWN')) {}
         this.shadow.color = 'lightgray'
@@ -375,12 +390,19 @@ export class Piece {
             this.draw('green', this.debugCanvas)
             // debugger
             this.erase(this.debugCanvas)
+            this.resetBlockSettings()
         }
         if(this.isIllegalPosition()){
             this.translate(lastPosition)
             return false
         } 
         return true
+    }
+
+    resetBlockSettings(){
+        this.blocksList.forEach((block) => {
+            block.resetSettings()
+        })
     }
 
     getNewPositionFrom({action, lastPosition}){
@@ -427,10 +449,17 @@ export class Piece {
             //do nothing
         }
         this.isActive = false
+        this.placePiece()
+        
+    }
+
+    placePiece(){
+        this.activeCanvas = this.availableCanvases['placedMinoBoardCanvas']
         this.blocksList.forEach((block) => {
             block.place()
         })
     }
+
 
     //TODO
     //each piece has 5/gravity seconds of grace time- how long a piece can sit on the ground before automatically being place
@@ -443,20 +472,25 @@ export class Piece {
         }
     }
     
-    draw({color, selectedCanvas = this.minoBoardCanvas} = {}){
+    draw(){
         this.blocksList.forEach( (block) => {
-            block.draw(color, selectedCanvas)
+            block.draw()
         })
     }
 
-    erase({selectedCanvas = this.minoBoardCanvas} = {}){
+    erase(){
         this.blocksList.forEach( (block) => {
-            block.erase(selectedCanvas)
+            block.erase()
         })
     }
 
     performAction(action){
         this.erase()
+
+        //TODO This whole thing is inelegant, I should find a way to refresh the page without having to call the piece to render. 
+        if (action === 'HOLD') {
+            return;
+        }
         //could probably be easily cleaned up but this isn't that bad
         const actions = {
             'SPAWN': () => {this.attemptTranslate(this.positionOfCenterBlock)},
@@ -469,7 +503,7 @@ export class Piece {
             'ROTATE180': () => {this.attemptRotate(action)},
             'HARDDROP': () => {
                 this.hardDrop()
-            },
+            }
         }
         actions[action]?.call(this)
 

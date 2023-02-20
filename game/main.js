@@ -3,7 +3,8 @@ import {GameBoard} from './subBoards.js'
 let playerBoard = new GameBoard({
     width: 9,
     height: 22,
-    domDocument: document
+    domDocument: document,
+    bagSystem: '7-bag'
 })
 
 playerBoard.startGame()
@@ -48,7 +49,6 @@ document.addEventListener("keydown", (event) => {
         case ' ':
             playerBoard.receiveInput('HARDDROP')
             break
-            
     }
     
 })

@@ -1,3 +1,5 @@
+//TODO- Find a better way of representing colors?
+
 export class Block {
     constructor({
         canvas, 
@@ -6,28 +8,24 @@ export class Block {
         positionOfCenterBlock, 
         color}
         ){
-
-        this.canvas = canvas
-        this.grid = grid
-        this.blockSize = blockSize
-        this.positionOfCenterBlock = positionOfCenterBlock
-        this.color = color
+        Object.assign(this, {canvas, grid, blockSize, positionOfCenterBlock, color})
+        this.defaults =  {canvas, grid, blockSize, positionOfCenterBlock, color}
         this.isActive = true
         this.centerOffset = [0,0] 
     }
 
-    draw({color = this.color, selectedCanvas = this.canvas} = {}){ //TODO- Find a better way of representing colors
+    draw(){ 
         let [y,x] = this.getAbsolutePosition()
-        const ctx = selectedCanvas.getContext("2d");
+        const ctx = this.canvas.getContext("2d");
         ctx.fillStyle = 'black';
         ctx.fillRect(x * this.blockSize, y * this.blockSize, this.blockSize, this.blockSize);        
-        ctx.fillStyle = color;
+        ctx.fillStyle = this.color;
         ctx.fillRect(x * this.blockSize + 1, y * this.blockSize + 1, this.blockSize -  2, this.blockSize - 2);
     }
 
-    erase({selectedCanvas = this.canvas} = {}){ //removes block, does not affect logic
+    erase(){ //removes block, does not affect logic
         let [y,x] = this.getAbsolutePosition()
-        const ctx = selectedCanvas.getContext("2d");
+        const ctx = this.canvas.getContext("2d");
         ctx.clearRect(x * this.blockSize, y * this.blockSize, this.blockSize , this.blockSize);
     }
 
@@ -36,6 +34,10 @@ export class Block {
         this.isActive = false
         this.grid[y][x] = this
         this.draw()
+    }
+
+    resetSettings(){
+        Object.assign(this, this.defaults)
     }
 
     getAbsolutePosition(){ //returns y,x coordinates to this.grid based on center's position and offset

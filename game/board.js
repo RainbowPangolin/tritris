@@ -12,9 +12,10 @@ export class Board {
         gravity = 1,
         shadowEnabled = true,
         previewSize = 5,
-        shapeQueue = []
+        shapeQueue = [],
+        spawnPoint = [2, 4]
     } = {}){ 
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, shapeQueue})
+        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, shapeQueue, spawnPoint})
         this.createGameStateGrid()
         this.initializeGameSettings()
         this.initializeCanvasDisplay()
@@ -44,19 +45,39 @@ export class Board {
 
     initializeCanvasDisplay(){
         this.blockSize = DEFAULT_BLOCK_SIZE
-        let minoBoardCanvas = this.domDocument.createElement("canvas");
-        let debugCanvas = this.domDocument.createElement("canvas");
-        debugCanvas.classList.add('debug')
-        minoBoardCanvas.classList.add('mainBoard')
-        minoBoardCanvas.width = DEFAULT_BLOCK_SIZE*this.width //TODO make size modular
-        minoBoardCanvas.height = DEFAULT_BLOCK_SIZE*this.height        
-        debugCanvas.width = DEFAULT_BLOCK_SIZE*this.width 
-        debugCanvas.height = DEFAULT_BLOCK_SIZE*this.height 
-        this.debugCanvas = debugCanvas
-        this.minoBoardCanvas = minoBoardCanvas
 
-        this.domDocument.body.append(minoBoardCanvas) 
-        this.domDocument.body.append(debugCanvas)
+        this.placedMinoBoardCanvas = this.getNewCanvas()
+        this.activeMinoBoardCanvas = this.getNewCanvas()
+        this.debugCanvas = this.getNewCanvas()
+
+        this.placedMinoBoardCanvas.classList.add('mainCanvas')
+        this.activeMinoBoardCanvas.classList.add('mainCanvas')
+        this.debugCanvas.classList.add('debug')
+
+        // let placedMinoBoardCanvas = this.domDocument.createElement("canvas");
+        // placedMinoBoardCanvas.classList.add('mainBoard')
+        // placedMinoBoardCanvas.width = this.blockSize*this.width //TODO make size modular
+        // placedMinoBoardCanvas.height = this.blockSize*this.height   
+        // this.placedMinoBoardCanvas = placedMinoBoardCanvas
+
+        // let activeMinoBoardCanvas = this.domDocument.createElement("canvas");
+        // let debugCanvas = this.domDocument.createElement("canvas");
+        // debugCanvas.classList.add('debug')
+        // debugCanvas.width = this.blockSize*this.width 
+        // debugCanvas.height = this.blockSize*this.height 
+        // this.debugCanvas = debugCanvas
+
+        this.domDocument.body.append(this.placedMinoBoardCanvas) 
+        this.domDocument.body.append(this.debugCanvas)
+        this.domDocument.body.append(this.activeMinoBoardCanvas)
+    }
+
+    //TODO All this is garbage still, I shoudl abstract it into a new object or interface
+    getNewCanvas(){
+        let newCanvas = this.domDocument.createElement("canvas");
+        newCanvas.width = this.blockSize*this.width //TODO make size modular
+        newCanvas.height = this.blockSize*this.height   
+        return newCanvas
     }
 
     addRequiredBags(){
@@ -82,38 +103,56 @@ export class Board {
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
         let activePiece = new Piece({
             shape: shape, 
-            minoBoardCanvas: this.minoBoardCanvas, 
-            debugCanvas: this.debugCanvas,
+            activeCanvas: this.activeMinoBoardCanvas, 
             gameStateGrid: this.gameStateGrid, 
             blockSize: this.blockSize, 
             positionOfCenterBlock: location, 
             orientation: 0, 
-            shadowEnabled: this.shadowEnabled,  
+            shadowEnabled: this.shadowEnabled,
+            availableCanvases: {
+                'activeMinoBoardCanvas': this.activeMinoBoardCanvas, 
+                'debugCanvas': this.debugCanvas,
+                'placedMinoBoardCanvas': this.placedMinoBoardCanvas
+            }, 
+            spawnPoint: this.spawnPoint
         })
         this.activePiece = activePiece
+        // this.activePiece.spawn()
         this.activePiece.performAction('SPAWN')
     }
+    
+    //TODO Write method that takes an array of actions and keeps doing receiveInput for testing
 
     receiveInput(action = 'MOVEDOWN'){
         this.activePiece.performAction(action)
         if(action == 'HARDDROP'){ //TODO These if statements are inelegant, and more functionality is down in Piece.js
             this.placePiece()
         } else if (action == 'HOLD'){
-            //TODO
+            this.swapHeldAndActivePieces()
         }
+        // this.refreshDisplay()
     }
 
-    placePiece(){
+    placePiece(){ //TODO Rename, this is an incorrect name
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeUpcomingPieceFromQueue()
     }
 
-    holdPiece(){
-        //For hold (i.e. swap) functionality
+    swapHeldAndActivePieces(){
+        if(this.heldPiece){
+            let tempPiece = this.heldPiece
+            this.heldPiece = this.activePiece
+            this.activePiece = tempPiece
+        } else {
+            this.heldPiece = this.activePiece
+            this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
+            this.removeUpcomingPieceFromQueue()
+        }
+
     }
 
     removeUpcomingPieceFromQueue(stepsAhead = 0){
-        this.shapeQueue.shift() //...
+        this.shapeQueue.shift() 
         this.addRequiredBags()
     }
 

@@ -1,8 +1,14 @@
 
 export function generateNewBagUsing(bagSystem){
+    if (Array.isArray(bagSystem)){
+        let newBag = structuredClone(bagSystem)
+        return newBag
+    }
     switch (bagSystem){
         case '7-bag':
             return new sevenBagGenerator().bag
+        default:
+            throw new Error(`Invalid bag system used: ${bagSystem} which is represented by ${typeof bagSystem}`)
     }
 }
 
@@ -18,5 +24,6 @@ function getShuffledArrayFrom(array){
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
-      return array;
+    
+    return array;
 }

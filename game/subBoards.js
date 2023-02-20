@@ -2,10 +2,11 @@ import {Board} from './board.js'
 
 
 export class GameBoard extends Board {
-    constructor({width, height, domDocument}){
-        super({width, height, domDocument})
+    constructor({width, height, domDocument, bagSystem}){
+        super({width, height, domDocument, bagSystem})
         this.debugCanvas.classList.add('debugCanvas')
-        this.minoBoardCanvas.classList.add('mainCanvas')
+        this.placedMinoBoardCanvas.classList.add('mainCanvas')
+        this.activeMinoBoardCanvas.classList.add('activeCanvas')
 
     } 
     //emit event for piece being placed
