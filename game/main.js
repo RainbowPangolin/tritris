@@ -1,7 +1,7 @@
-import {GameBoardSession} from './subBoards.js'
+import {BoardSession} from './boardSession.js'
 
-let playerBoard = new GameBoardSession({
-    width: 9,
+let playerBoard = new BoardSession({
+    width: 10,
     height: 22,
     domDocument: document,
     bagSystem: '7-bag'

@@ -4,9 +4,9 @@ import {ExtraPieceDrawer} from './extraPieceDrawer.js'
 
 const DEFAULT_BLOCK_SIZE = 25
 
-export class BoardSession {
+export class BoardSession{
     constructor({
-        width = 9, 
+        width = 10, 
         height = 22, 
         domDocument = null,  
         bagSystem = '7-bag',
@@ -146,6 +146,13 @@ export class BoardSession {
         })
         this.activePiece = activePiece
         this.activePiece.performAction('SPAWN')
+        this.activePiece.addEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
+    }
+
+    handlePiecePlacedEvent(){
+        // console.log('asdf')
+        this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
+        this.removeNextPieceFromQueue()
     }
     
     //TODO Write method that takes an array of actions and keeps doing receiveInput for testing
@@ -158,7 +165,7 @@ export class BoardSession {
     receiveInput(action = 'MOVEDOWN'){
         this.activePiece.performAction(action)
         if(action == 'HARDDROP'){ //TODO These if statements are inelegant, and more functionality is down in Piece.js
-            this.placePiece()
+            // this.placePiece()
         } else if (action == 'HOLD'){
             this.swapHeldAndActivePieces()
         }
@@ -174,6 +181,7 @@ export class BoardSession {
         //Also, for some reason in the Piece class, it has it's own placePiece that actually places the piece after the associated action is passed into receiveInput()
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
+        this.activePiece.removeEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
     }
 
     swapHeldAndActivePieces(){

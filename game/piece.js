@@ -7,10 +7,9 @@ function getDefaultColorOfPiece(shape){
 }
 
 export class Piece extends EventTarget{
-
     //TODO This looks stupid alone here, I should probably make everything consistent
     #activeCanvas
-
+    #color
     constructor({
         shape,
         activeCanvas,
@@ -22,7 +21,6 @@ export class Piece extends EventTarget{
         availableCanvases,
         spawnPoint,
     }){
-
         super()
         this.blocksList = []
         Object.assign(this, {shape, activeCanvas, gameStateGrid, blockSize, positionOfCenterBlock, orientation, shadowEnabled, availableCanvases, spawnPoint})
@@ -69,8 +67,8 @@ export class Piece extends EventTarget{
         return this.blocksList[0].color
     }
 
-    set color(color){ //redundant method but /shrug
-        this._color = color
+    set color(color){ 
+        this.#color = color
         this.blocksList.forEach((block) => {
             block.color = color
         })
@@ -80,7 +78,7 @@ export class Piece extends EventTarget{
 
 
     applyBlockOffsets(){
-        this.blocksList[0].centerOffset = [0,0]
+        // this.blocksList[0].centerOffset = [0,0]
         let offsetsList = this.getBlockOffsets(this.shape, this.orientation)
         this.blocksList.forEach( 
             (block, index) => {
@@ -89,11 +87,11 @@ export class Piece extends EventTarget{
     }
 
     getBlockOffsets(piece, orientation){
-        let tilesMatrix = PIECES[piece][orientation]
-        // let center = Math.trunc(tilesMatrix.length / 2) in case we add objects with more than 4 tiles
+        let pieceTilesMatrix = PIECES[piece][orientation]
+        // let center = Math.trunc(pieceTilesMatrix.length / 2) in case we add objects with more than 4 tiles
         let offsets = []
-        let center = 1 //all pieces rotate their centers around point 1,1, except I and O but that doesn't matter
-        tilesMatrix.forEach((array, row) => {
+        let center = 1 //all pieces rotate their centers around point 1,1 including I and O for now
+        pieceTilesMatrix.forEach((array, row) => {
             array.forEach((element, column) => {
                 if (element != 0) {
                     offsets.push([row - center, column - center])
@@ -169,7 +167,7 @@ export class Piece extends EventTarget{
         this.translate(newPosition)
         if(options.fromKick){
             this.canvas = this.availableCanvases['debugCanvas']
-            this.color = 'green'
+            this.#color = 'green'
             this.draw()
             // debugger
             this.erase()
@@ -211,7 +209,7 @@ export class Piece extends EventTarget{
         return newPosition
     }
 
-    //translation on a plane- move left right or down 
+    //Uses absolute coordinates
     translate(coords){ 
         let y = coords[0]
         let x = coords[1]
@@ -247,6 +245,8 @@ export class Piece extends EventTarget{
         this.blocksList.forEach((block) => {
             block.place()
         })
+
+        this.dispatchEvent(new CustomEvent('onPiecePlacedEvent'));
     }
 
 
@@ -275,13 +275,11 @@ export class Piece extends EventTarget{
 
     updateGameStateWithAction(action){
         //TODO This whole thing is inelegant, I should find a way to refresh the page without having to call the piece to render. 
-        if (action === 'HOLD') {
-            return;
-        }
         const actions = {
+            'HOLD': () => {}, //does nothing
             'SPAWN': () => {
                 
-                this.attemptTranslate(this.spawnPoint)
+                this.translate(this.spawnPoint)
                 this.dispatchEvent(new CustomEvent('onPieceSpawnEvent', {
                 }));
             },
