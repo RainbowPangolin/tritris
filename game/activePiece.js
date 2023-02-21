@@ -33,9 +33,6 @@ export class ActivePiece extends Piece{
 
     addNewShadow(newPiece){
         this.addEventListener('onPieceUpdateEvent', newPiece.handleUpdateEvent.bind(newPiece));
-        this.addEventListener('onPiecePlaceEvent', newPiece.handlePlaceEvent.bind(newPiece));
         this.shadowPiece = newPiece
     }
-
-    //whenever activepiece moves, shadow piece moves to where active piece is, inherits rotation, and harddrops itself
 }

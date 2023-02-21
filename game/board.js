@@ -80,7 +80,7 @@ export class Board {
 
     startGame(){
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
-        this.removeUpcomingPieceFromQueue()
+        this.removeNextPieceFromQueue()
     }
 
     changeGravity(gravity){
@@ -127,7 +127,7 @@ export class Board {
     placePiece(){ //TODO Rename, this is an incorrect name
         //Also, for some reason in the Piece class, it has it's own placePiece that actually places the piece after the associated action is passed into receiveInput()
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
-        this.removeUpcomingPieceFromQueue()
+        this.removeNextPieceFromQueue()
     }
 
     swapHeldAndActivePieces(){
@@ -138,12 +138,12 @@ export class Board {
         } else {
             this.heldPiece = this.activePiece
             this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
-            this.removeUpcomingPieceFromQueue()
+            this.removeNextPieceFromQueue()
         }
 
     }
 
-    removeUpcomingPieceFromQueue(stepsAhead = 0){
+    removeNextPieceFromQueue(stepsAhead = 0){
         this.shapeQueue.shift() 
         this.addRequiredBags()
     }
