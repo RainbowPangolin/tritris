@@ -1,10 +1,17 @@
-//TODO JSDOM
-
 import { GameBoard } from '../game/subBoards.js';
 import jsdom from"jsdom";
-const { JSDOM } = jsdom;
-// const assert = require('assert');
+import {CustomEventMock} from "./customEventMock.js"
 import assert from 'node:assert';
+
+const { JSDOM } = jsdom;
+
+beforeEach(() => {
+  global.CustomEvent = CustomEventMock;
+});
+
+afterEach(() => {
+  delete global.CustomEvent;
+});
 
 describe('Debug Bag System', function () {
   const testBag = ['T','L', 'J','S','I','Z','O']
@@ -15,8 +22,6 @@ describe('Debug Bag System', function () {
       domDocument: dom.window.document,
       bagSystem: testBag
     })
-
-  // board.startGame()
 
   it("should allow me to specify an arbitrarily sized bag of any valid shapes", function () {
     for (let i = 0; i < 7; i++){

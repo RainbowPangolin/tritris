@@ -160,7 +160,7 @@ export class Board {
     }
 
     get shadowPiece(){
-        return this.activePiece.shadow
+        return this.activePiece.shadowPiece
     }
 
 }

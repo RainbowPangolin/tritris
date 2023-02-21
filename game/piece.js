@@ -446,7 +446,6 @@ export class Piece extends EventTarget{
         this.blocksList.forEach((block) => {
             block.place()
         })
-        this.dispatchEvent(new CustomEvent('onPiecePlaceEvent')); 
     }
 
 
