@@ -1,4 +1,6 @@
 export function generateNewBagUsing(bagSystem){
+
+    //For debugging, you can pass in an array like ['T','L', 'J','S','I','Z','O'] for a predictable bag. 
     if (Array.isArray(bagSystem)){
         let newBag = structuredClone(bagSystem)
         return newBag

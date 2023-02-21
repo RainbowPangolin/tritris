@@ -72,8 +72,8 @@ describe('7-Bag system', function () {
 
   it('should, after enough pieces have been used, add another bag to the queue', function () {
     board.startGame() //now 6 pieces in queue
-    board.placePiece() //now 5 pieces in queue
-    board.placePiece() //now 4 + 7 = 11 pieces in queue
+    board.receiveInput('HARDDROP') //now 5 pieces in queue
+    board.receiveInput('HARDDROP') //now 4 + 7 = 11 pieces in queue
     assert.equal(board.pieceQueue.length, 11, 'New bag was not added correctly')
   })
 
@@ -155,7 +155,45 @@ describe('Hold piece display', function() {
   })
 
   it('should show the correct piece in the held box', function() {
-    //No idea how to test this yet.
+    //No idea how to test this yet. TODO.
+  })
+
+})
+
+describe('Placing Blocks', function() {
+  let board
+  beforeEach(() => {
+    const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+    board = new BoardSession({
+      width: 9,
+      height: 22,
+      domDocument: dom.window.document,
+      bagSystem: ['T','L', 'J','S','I','Z','O']
+    })
+    board.startGame()
+    board.swapHeldAndActivePieces()
+  })
+
+  it('Should place blocks onto the internal grid', function() {
+
+  })
+})
+
+describe('Clearing Lines', function() {
+  let board
+  beforeEach(() => {
+    const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+    board = new BoardSession({
+      width: 9,
+      height: 22,
+      domDocument: dom.window.document,
+      bagSystem: ['I','I', 'O','S','I','Z','O']
+    })
+    board.startGame()
+  }) 
+
+  it('Should clear a line', function() {
+
   })
 
 })
