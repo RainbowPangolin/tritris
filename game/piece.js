@@ -276,12 +276,12 @@ export class Piece extends EventTarget{
     updateGameStateWithAction(action){
         //TODO This whole thing is inelegant, I should find a way to refresh the page without having to call the piece to render. 
         const actions = {
-            'HOLD': () => {}, //does nothing
+            'HOLD': () => {
+                this.dispatchEvent(new CustomEvent('onPieceHeldEvent', {}))
+            }, 
             'SPAWN': () => {
-                
                 this.translate(this.spawnPoint)
-                this.dispatchEvent(new CustomEvent('onPieceSpawnEvent', {
-                }));
+                this.dispatchEvent(new CustomEvent('onPieceSpawnEvent', {}));
             },
             'MOVEDOWN': () => {this.attemptTranslate(action)},
             'MOVELEFT': () => {this.attemptTranslate(action)},
@@ -301,7 +301,9 @@ export class Piece extends EventTarget{
         this.erase()
         //could probably be easily cleaned up but this isn't that bad
         this.updateGameStateWithAction(action)
-
+        if(action == 'HOLD'){
+            return
+        }
         this.dispatchEvent(new CustomEvent('onPieceUpdateEvent', {
             detail: {
                 isActive: this.isActive,
@@ -310,6 +312,8 @@ export class Piece extends EventTarget{
                 newOrientation: this.orientation
             }
         }));
+
+
         this.draw()
     }
 }

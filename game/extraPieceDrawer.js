@@ -5,10 +5,8 @@ const FOUR_GRID = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 export class ExtraPieceDrawer{
     constructor(){
-        
+        //Does nothing, I might not want to use a class for this.    
     }
-
-
     setShapeToDisplayHeld(piece){
         //TODO How bad is it that this relies on another class populating the field?
         let curCanvas = this.availableCanvases['heldPieceCanvas']
@@ -31,8 +29,6 @@ export class ExtraPieceDrawer{
     }
 
     setNewPreviewsTo(arrayOfPieces){
-        // console.log(this.availableCanvases['previewCanvasList'])
-
         arrayOfPieces.forEach((shape, index) => {
             let curCanvas = this.availableCanvases['previewCanvasList'][index] 
             this.clearCanvas(curCanvas)
@@ -47,11 +43,8 @@ export class ExtraPieceDrawer{
                 availableCanvases: [curCanvas],
                 spawnPoint: [1,1]
             })
-    
             queuePiece.performAction('SPAWN')
         })
-
-
     }
 
     clearCanvas(canvas){

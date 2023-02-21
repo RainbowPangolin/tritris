@@ -14,7 +14,7 @@ export class BoardSession{
         shadowEnabled = true,
         previewSize = 5,
         pieceQueue = [],
-        spawnPoint = [2, 4]
+        spawnPoint = [2, Math.floor(width/2) - 1]
     } = {}){ 
         Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint})
         this.createGameStateGrid()
@@ -91,7 +91,7 @@ export class BoardSession{
         } else {
             //Just enough to draw a piece
             newCanvas.width = this.blockSize*4
-            newCanvas.height = this.blockSize*4
+            newCanvas.height = this.blockSize*3
         }
 
         return newCanvas
@@ -147,14 +147,21 @@ export class BoardSession{
         this.activePiece = activePiece
         this.activePiece.performAction('SPAWN')
         this.activePiece.addEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
+        this.activePiece.addEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
     }
 
     handlePiecePlacedEvent(){
-        // console.log('asdf')
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
+        this.activePiece.removeEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
+        this.activePiece.removeEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
+
     }
-    
+
+    handlePieceHeldEvent(){
+        this.swapHeldAndActivePieces()
+    }
+
     //TODO Write method that takes an array of actions and keeps doing receiveInput for testing
     receiveTheArrayOfInputs(array){
         array.forEach((action) => {
@@ -162,13 +169,9 @@ export class BoardSession{
         })
     }
 
+    //TODO This is inelegant, there is probably a smarter way of doing this.
     receiveInput(action = 'MOVEDOWN'){
         this.activePiece.performAction(action)
-        if(action == 'HARDDROP'){ //TODO These if statements are inelegant, and more functionality is down in Piece.js
-            // this.placePiece()
-        } else if (action == 'HOLD'){
-            this.swapHeldAndActivePieces()
-        }
     }
     
     clearActiveDisplay(){
@@ -177,12 +180,7 @@ export class BoardSession{
         context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    placePiece(){ //TODO Rename, this is an incorrect name
-        //Also, for some reason in the Piece class, it has it's own placePiece that actually places the piece after the associated action is passed into receiveInput()
-        this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
-        this.removeNextPieceFromQueue()
-        this.activePiece.removeEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
-    }
+
 
     swapHeldAndActivePieces(){
         //TODO This should probably be done during receiveInput() or something
@@ -191,13 +189,13 @@ export class BoardSession{
             let tempPiece = this.heldPiece
             this.heldPiece = this.activePiece
             this.activePiece = tempPiece
+            this.activePiece.performAction('SPAWN')
         } else {
             this.heldPiece = this.activePiece
             this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
             this.removeNextPieceFromQueue()
         }
         this.updateHeldPieceDisplay()
-        this.activePiece.performAction('SPAWN')
     }
     updateHeldPieceDisplay(){
         this.extraPieceDrawer.setShapeToDisplayHeld(this.heldPiece.shape)
