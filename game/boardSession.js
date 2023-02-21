@@ -1,9 +1,10 @@
 import {ActivePiece} from './activePiece.js'
 import {generateNewBagUsing} from './bagSystem.js'
+import {ExtraPieceDrawer} from './extraPieceDrawer.js'
 
 const DEFAULT_BLOCK_SIZE = 25
 
-export class Board {
+export class BoardSession {
     constructor({
         width = 9, 
         height = 22, 
@@ -12,14 +13,25 @@ export class Board {
         gravity = 1,
         shadowEnabled = true,
         previewSize = 5,
-        shapeQueue = [],
+        pieceQueue = [],
         spawnPoint = [2, 4]
     } = {}){ 
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, shapeQueue, spawnPoint})
+        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint})
         this.createGameStateGrid()
         this.initializeGameSettings()
         this.initializeCanvasDisplay()
+        this.initializeExtraPieceDrawer()
         this.addRequiredBags()
+    }
+
+    initializeExtraPieceDrawer(){
+        this.extraPieceDrawer = new ExtraPieceDrawer()
+        this.extraPieceDrawer.availableCanvases = {                
+            'previewCanvasList': this.previewCanvasList,
+            'heldPieceCanvas': this.heldPieceCanvas,
+        }
+        this.extraPieceDrawer.previewBlockSize = this.blockSize
+        this.extraPieceDrawer.heldBlockSize = this.blockSize
     }
 
     createGameStateGrid(){
@@ -43,34 +55,63 @@ export class Board {
         //does nothing?
     }
 
+    //TODO This might be worth refactoring to be less dumb
     initializeCanvasDisplay(){
         this.blockSize = DEFAULT_BLOCK_SIZE
 
         this.placedMinoBoardCanvas = this.getNewCanvas()
         this.activeMinoBoardCanvas = this.getNewCanvas()
         this.debugCanvas = this.getNewCanvas()
+        this.heldPieceCanvas = this.getNewCanvas({type: 'heldPieceCanvas'})
 
-        this.placedMinoBoardCanvas.classList.add('mainCanvas')
-        this.activeMinoBoardCanvas.classList.add('mainCanvas')
-        this.debugCanvas.classList.add('debug')
-
+        
         this.domDocument.body.append(this.placedMinoBoardCanvas) 
         this.domDocument.body.append(this.debugCanvas)
         this.domDocument.body.append(this.activeMinoBoardCanvas)
+        //Equivalent call for previewCanvases called in getNewPreviewCanvases
+        this.domDocument.body.append(this.heldPieceCanvas) 
+
+        this.debugCanvas.classList.add('debugCanvas')
+        this.placedMinoBoardCanvas.classList.add('placedMinoCanvas')
+        this.activeMinoBoardCanvas.classList.add('activeMinoCanvas')
+        //Equivalent call for previewCanvases called in getNewPreviewCanvases
+        this.heldPieceCanvas.classList.add('heldPieceCanvas')
+
+        this.previewCanvasList = this.getNewPreviewCanvases()
+
+
     }
 
     //TODO All this is garbage still, I shoudl abstract it into a new object or interface
-    getNewCanvas(){
+    getNewCanvas({type = 'minoBoardCanvas'} = {}){
         let newCanvas = this.domDocument.createElement("canvas");
-        newCanvas.width = this.blockSize*this.width 
-        newCanvas.height = this.blockSize*this.height   
+        if(type == 'minoBoardCanvas'){
+            newCanvas.width = this.blockSize*this.width 
+            newCanvas.height = this.blockSize*this.height   
+        } else {
+            //Just enough to draw a piece
+            newCanvas.width = this.blockSize*4
+            newCanvas.height = this.blockSize*4
+        }
+
         return newCanvas
     }
 
+    getNewPreviewCanvases(){
+        let listOfPreviewCanvases = []
+        for (let i = 0; i < this.previewSize; i++){
+            let newPreviewCanvas = this.getNewCanvas({type: 'previewCanvas'})
+            listOfPreviewCanvases.push(newPreviewCanvas)
+            this.domDocument.body.append(newPreviewCanvas) 
+            newPreviewCanvas.classList.add('previewCanvas')
+        }
+        return listOfPreviewCanvases
+    }
+
     addRequiredBags(){
-        while(this.previewSize > this.shapeQueue.length){
+        while(this.previewSize > this.pieceQueue.length){
             let newBag = this.getNewBag()
-            this.shapeQueue.push(...newBag)
+            this.pieceQueue.push(...newBag)
         }
     }
 
@@ -96,10 +137,10 @@ export class Board {
             positionOfCenterBlock: location, 
             orientation: 0, 
             shadowEnabled: this.shadowEnabled,
-            availableCanvases: {
+            availableCanvases: {//TODO Possibly just dissolve this object?
                 'activeMinoBoardCanvas': this.activeMinoBoardCanvas, 
                 'debugCanvas': this.debugCanvas,
-                'placedMinoBoardCanvas': this.placedMinoBoardCanvas
+                'placedMinoBoardCanvas': this.placedMinoBoardCanvas,
             }, 
             spawnPoint: this.spawnPoint
         })
@@ -121,7 +162,12 @@ export class Board {
         } else if (action == 'HOLD'){
             this.swapHeldAndActivePieces()
         }
-        //TODO this.refreshDisplay()???
+    }
+    
+    clearActiveDisplay(){
+        let canvas = this.activeMinoBoardCanvas
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     placePiece(){ //TODO Rename, this is an incorrect name
@@ -131,6 +177,8 @@ export class Board {
     }
 
     swapHeldAndActivePieces(){
+        //TODO This should probably be done during receiveInput() or something
+        this.clearActiveDisplay()
         if(this.heldPiece){
             let tempPiece = this.heldPiece
             this.heldPiece = this.activePiece
@@ -140,16 +188,28 @@ export class Board {
             this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
             this.removeNextPieceFromQueue()
         }
-
+        this.updateHeldPieceDisplay()
+        this.activePiece.performAction('SPAWN')
+    }
+    updateHeldPieceDisplay(){
+        this.extraPieceDrawer.setShapeToDisplayHeld(this.heldPiece.shape)
     }
 
     removeNextPieceFromQueue(stepsAhead = 0){
-        this.shapeQueue.shift() 
+        this.pieceQueue.shift() 
         this.addRequiredBags()
+        this.updatePreviewDisplay()
+    }
+    updatePreviewDisplay(){
+        let piecesInQueueToDisplay = []
+        for (let i = 0; i < this.previewSize; i++){
+            piecesInQueueToDisplay.push(this.pieceQueue[i])
+        }
+        this.extraPieceDrawer.setNewPreviewsTo(piecesInQueueToDisplay)
     }
 
     getUpcomingShape(stepsAhead = 0){
-        return this.shapeQueue[stepsAhead]
+        return this.pieceQueue[stepsAhead]
     }
 
     blockDropped(){

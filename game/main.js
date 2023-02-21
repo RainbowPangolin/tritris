@@ -1,6 +1,6 @@
-import {GameBoard} from './subBoards.js'
+import {GameBoardSession} from './subBoards.js'
 
-let playerBoard = new GameBoard({
+let playerBoard = new GameBoardSession({
     width: 9,
     height: 22,
     domDocument: document,

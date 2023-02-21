@@ -1,4 +1,4 @@
-import { GameBoard } from '../game/subBoards.js';
+import { GameBoardSession } from '../game/subBoards.js';
 import jsdom from"jsdom";
 import {CustomEventMock} from "./customEventMock.js"
 import assert from 'node:assert';
@@ -16,7 +16,7 @@ afterEach(() => {
 describe('Debug Bag System', function () {
   const testBag = ['T','L', 'J','S','I','Z','O']
   const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-    let board = new GameBoard({
+    let board = new GameBoardSession({
       width: 9,
       height: 22,
       domDocument: dom.window.document,
@@ -35,7 +35,7 @@ describe('7-Bag system', function () {
   let board
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-    board = new GameBoard({
+    board = new GameBoardSession({
       width: 9,
       height: 22,
       domDocument: dom.window.document,
@@ -82,7 +82,7 @@ describe('7-Bag system', function () {
 describe('Shadowpiece color', function () {
   it("should be different from the parent piece's color", function () {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-    let board = new GameBoard({
+    let board = new GameBoardSession({
       width: 9,
       height: 22,
       domDocument: dom.window.document
@@ -100,7 +100,7 @@ describe('Shadowpiece color', function () {
 describe('Kick table', function () {
   it("should allow pieces to kick without throwing errors", function () {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-    let board = new GameBoard({
+    let board = new GameBoardSession({
       width: 9,
       height: 22,
       domDocument: dom.window.document
@@ -115,7 +115,7 @@ describe('Hold piece function', function () {
   let board
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-    board = new GameBoard({
+    board = new GameBoardSession({
       width: 9,
       height: 22,
       domDocument: dom.window.document,
@@ -138,4 +138,24 @@ describe('Hold piece function', function () {
     assert.equal(board.activePiece.shape, 'T')
     assert.equal(board.heldPiece.shape, 'L')
   })
+})
+
+describe('Hold piece display', function() {
+  let board
+  beforeEach(() => {
+    const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+    board = new GameBoardSession({
+      width: 9,
+      height: 22,
+      domDocument: dom.window.document,
+      bagSystem: ['T','L', 'J','S','I','Z','O']
+    })
+    board.startGame()
+    board.swapHeldAndActivePieces()
+  })
+
+  it('should show the correct piece in the held box', function() {
+    //No idea how to test this yet.
+  })
+
 })

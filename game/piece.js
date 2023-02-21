@@ -1,216 +1,16 @@
 import {Block} from './block.js'
 
-//Contains a 2d matrix of each piece in each orientation
-const PIECES = {
-    'J': [
-        //position 1
-        [[1, 0, 0],
-         [1, 1, 1],
-         [0, 0, 0],], 
-        //position 2
-        [[0, 1, 1],
-         [0, 1, 0],
-         [0, 1, 0],], 
-        //position 3
-        [[0, 0, 0],
-         [1, 1, 1],
-         [0, 0, 1],], 
-        //position 4
-        [[0, 1, 0],
-         [0, 1, 0],
-         [1, 1, 0],], 
-    ],
-    'L': [
-        //position 1
-        [[0, 0, 1],
-         [1, 1, 1],
-         [0, 0, 0],], 
-        //position 2
-        [[0, 1, 0],
-         [0, 1, 0],
-         [0, 1, 1],], 
-        //position 3
-        [[0, 0, 0],
-         [1, 1, 1],
-         [1, 0, 0],], 
-        //position 4
-        [[1, 1, 0],
-         [0, 1, 0],
-         [0, 1, 0],], 
-    ],
-    'S': [
-        //position 1
-        [[0, 1, 1],
-         [1, 1, 0],
-         [0, 0, 0],], 
-        //position 2
-        [[0, 1, 0],
-         [0, 1, 1],
-         [0, 0, 1],], 
-        //position 3
-        [[0, 0, 0],
-         [0, 1, 1],
-         [1, 1, 0],], 
-        //position 4
-        [[1, 0, 0],
-         [1, 1, 0],
-         [0, 1, 0],], 
-    ],
-    'Z': [
-        //position 1
-        [[1, 1, 0],
-         [0, 1, 1],
-         [0, 0, 0],], 
-        //position 2
-        [[0, 0, 1],
-         [0, 1, 1],
-         [0, 1, 0],], 
-        //position 3
-        [[0, 0, 0],
-         [1, 1, 0],
-         [0, 1, 1],], 
-        //position 4
-        [[0, 1, 0],
-         [1, 1, 0],
-         [1, 0, 0],], 
-    ],
-    'T': [
-        //position 1
-        [[0, 1, 0],
-         [1, 1, 1],
-         [0, 0, 0],], 
-        //position 2
-        [[0, 1, 0],
-         [0, 1, 1],
-         [0, 1, 0],], 
-        //position 3
-        [[0, 0, 0],
-         [1, 1, 1],
-         [0, 1, 0],], 
-        //position 4
-        [[0, 1, 0],
-         [1, 1, 0],
-         [0, 1, 0],], 
-    ],
-    'I': [
-        //position 1
-        [[0, 0, 0, 0],
-         [1, 1, 1, 1],
-         [0, 0, 0, 0],
-         [0, 0, 0, 0],], 
-        //position 2
-        [[0, 0, 1, 0],
-         [0, 0, 1, 0],
-         [0, 0, 1, 0],
-         [0, 0, 1, 0],], 
-        //position 3
-        [[0, 0, 0, 0],
-         [0, 0, 0, 0],
-         [1, 1, 1, 1],
-         [0, 0, 0, 0],], 
-        //position 4
-        [[0, 1, 0, 0],
-         [0, 1, 0, 0],
-         [0, 1, 0, 0],
-         [0, 1, 0, 0],], 
-    ],
-    'O': [
-        //position 1
-        [[0, 1, 1, 0],
-         [0, 1, 1, 0],
-         [0, 0, 0, 0],
-         [0, 0, 0, 0],],
-        //position 2
-        [[0, 1, 1, 0],
-         [0, 1, 1, 0],
-         [0, 0, 0, 0],
-         [0, 0, 0, 0],],
-        //position 3
-        [[0, 1, 1, 0],
-         [0, 1, 1, 0],
-         [0, 0, 0, 0],
-         [0, 0, 0, 0],],
-        //position 4
-        [[0, 1, 1, 0],
-         [0, 1, 1, 0],
-         [0, 0, 0, 0],
-         [0, 0, 0, 0],],  
-    ]
-}
-
-const PIECE_COLOR_MAP = {
-    "J": 'blue',
-    "L": 'orange',
-    "S": 'limegreen',
-    "Z": 'red',
-    "T": 'magenta',
-    "I": 'aqua',
-    "O": 'yellow'
-}
-
-let u, v 
-const KICK_TABLE = {
-    //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
-    //180 kicks based on TETR.IO kick table
-    // https://pbs.twimg.com/media/EaWH8QgXgAArDEV?format=png&name=large
-    'L': (v = {
-        '0,1': [[0, -1], [-1, -1], [2, 0], [2, -1]],
-        '1,0': [[0, 1], [1, 1], [-2, 0], [-2,1]],
-        '1,2': [[0,1], [1, 1], [-2,0], [-2,1]],
-        '2,1': [[0,-1], [-1, -1], [2,0], [2,-1]],
-        '2,3': [[0,1], [-1,1], [2,0], [2,1]],
-        '3,2': [[0,-1], [1,-1], [-2,0], [-2,-1]],
-        '3,0': [[0,-1], [1,-1], [-2,0], [-2,-1]],
-        '0,3': [[0,1], [-1,1], [2,0], [2, 1]],
-        '0,2': [[-1, 0], [-1,1], [1,1], [0,1], [0,-1],],
-        '2,0': [[1,0], [1, -1], [1, 1], [0, -1], [0,1]],
-        '1,3': [[0, 1], [-2, 1], [-1, 1], [-2, 0], [-1,0]],
-        '3,1': [[0, -1], [-2, -1], [-1,-1], [-2, 0], [-1,0]],
-
-        
-    }),
-    'J': v,
-    'S': v,
-    'Z': v,
-    'T': v,
-    '3L': v,
-    'I': (u = {
-        '0,1': [[0, -2], [0, 1], [1, -2], [-2,1]],
-        '1,0': [[0, 2], [0, -1], [-1,2], [2,-1]],
-        '1,2': [[0, -1], [0, 2], [-2,-1], [1,2]],
-        '2,1': [[0,1], [0, -2], [2,1], [-1,-2]],
-        '2,3': [[0,2], [0, -1], [-1,2], [2,-1]],
-        '3,2': [[0,-2], [0, 1], [1,-2], [2,1]],
-        '3,0': [[0,1], [0, -2], [2,1], [-1,-2]],
-        '0,3': [[0,-1], [0, 2], [-2,-1], [1,2]],
-        '0,2': [[0, 0]],
-        '2,0': [[0, 0]],
-        '1,3': [[0, 0]],
-        '3,1': [[0, 0]],
-    }),
-    '3I': u,
-    'O': {
-        '0,1': [[0, 0]],
-        '1,0': [[0, 0]],
-        '1,2': [[0, 0]],
-        '2,1': [[0, 0]],
-        '2,3': [[0, 0]],
-        '3,2': [[0, 0]],
-        '3,0': [[0, 0]],
-        '0,3': [[0, 0]],
-        '0,2': [[0, 0]],
-        '2,0': [[0, 0]],
-        '1,3': [[0, 0]],
-        '3,1': [[0, 0]],
-    },
-
-}
+import {PIECES, PIECE_COLOR_MAP, KICK_TABLE} from './constants.js'
 
 function getDefaultColorOfPiece(shape){
     return PIECE_COLOR_MAP[shape]
 }
 
 export class Piece extends EventTarget{
+
+    //TODO This looks stupid alone here, I should probably make everything consistent
+    #activeCanvas
+
     constructor({
         shape,
         activeCanvas,
@@ -255,14 +55,14 @@ export class Piece extends EventTarget{
     }
 
     set activeCanvas(activeCanvas){
-        this._activeCanvas = activeCanvas
+        this.#activeCanvas = activeCanvas
         this.blocksList.forEach((block) => {
             block.activeCanvas = activeCanvas
         })
     }
 
     get activeCanvas(){
-        return this._activeCanvas
+        return this.#activeCanvas
     }
 
     get color(){
@@ -369,10 +169,11 @@ export class Piece extends EventTarget{
         this.translate(newPosition)
         if(options.fromKick){
             this.canvas = this.availableCanvases['debugCanvas']
+            this.color = 'green'
             this.draw()
             // debugger
             this.erase()
-            this.canvas = this.availableCanvases['activeMino']
+            this.canvas = this.availableCanvases['activeMinoCanvas']
 
             this.resetBlockSettings()
         }
@@ -479,7 +280,8 @@ export class Piece extends EventTarget{
         }
         const actions = {
             'SPAWN': () => {
-                this.attemptTranslate(this.positionOfCenterBlock)
+                
+                this.attemptTranslate(this.spawnPoint)
                 this.dispatchEvent(new CustomEvent('onPieceSpawnEvent', {
                 }));
             },
@@ -499,10 +301,7 @@ export class Piece extends EventTarget{
 
     performAction(action){
         this.erase()
-
-        
         //could probably be easily cleaned up but this isn't that bad
-        
         this.updateGameStateWithAction(action)
 
         this.dispatchEvent(new CustomEvent('onPieceUpdateEvent', {
@@ -513,10 +312,6 @@ export class Piece extends EventTarget{
                 newOrientation: this.orientation
             }
         }));
-
         this.draw()
-
-        
-
     }
 }

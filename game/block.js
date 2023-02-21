@@ -14,6 +14,14 @@ export class Block {
         this.centerOffset = [0,0] 
     }
 
+    set activeCanvas(canvas){
+        this.canvas = canvas
+    }
+
+    get activeCanvas(){
+        return this.canvas
+    }
+
     draw(){ 
         let [y,x] = this.getAbsolutePosition()
         const ctx = this.canvas.getContext("2d");
