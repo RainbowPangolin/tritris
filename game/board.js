@@ -1,4 +1,4 @@
-import {Piece} from './piece.js'
+import {ActivePiece} from './activePiece.js'
 import {generateNewBagUsing} from './bagSystem.js'
 
 const DEFAULT_BLOCK_SIZE = 25
@@ -88,7 +88,7 @@ export class Board {
     }
     
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
-        let activePiece = new Piece({
+        let activePiece = new ActivePiece({
             shape: shape, 
             activeCanvas: this.activeMinoBoardCanvas, 
             gameStateGrid: this.gameStateGrid, 
@@ -125,6 +125,7 @@ export class Board {
     }
 
     placePiece(){ //TODO Rename, this is an incorrect name
+        //Also, for some reason in the Piece class, it has it's own placePiece that actually places the piece after the associated action is passed into receiveInput()
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeUpcomingPieceFromQueue()
     }

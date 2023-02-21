@@ -15,8 +15,26 @@
         margin: 0 auto;
       }
       /* TODO- Add a background and stuff */
-      canvas.mainCanvas{
+      canvas.placedMinoCanvas{
         /* background: #eee; */
+        position: absolute;
+        display: block;
+        margin: 0 auto;
+      }
+      canvas.activeMinoCanvas{
+        /* background: #eee; */
+        position: absolute;
+        display: block;
+        margin: 0 auto;
+      }
+      canvas.miscCanvas{
+        /* background: #eee; */
+        position: absolute;
+        display: block;
+        margin: 0 auto;
+      }
+      canvas.backGround{
+        background: #eee;
         position: absolute;
         display: block;
         margin: 0 auto;
@@ -43,6 +61,7 @@
   </head>
   <body>
 
+    <canvas class="backGround" width = 224 height= 550></canvas>
     <script type="module" src="/game/main.js" >
       // JavaScript code goes here
     </script>

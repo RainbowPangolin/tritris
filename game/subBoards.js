@@ -5,11 +5,11 @@ export class GameBoard extends Board {
     constructor({width, height, domDocument, bagSystem}){
         super({width, height, domDocument, bagSystem})
         this.debugCanvas.classList.add('debugCanvas')
-        this.placedMinoBoardCanvas.classList.add('mainCanvas')
-        this.activeMinoBoardCanvas.classList.add('activeCanvas')
+        this.placedMinoBoardCanvas.classList.add('placedMinoCanvas')
+        this.activeMinoBoardCanvas.classList.add('activeMinoCanvas')
 
     } 
-    //emit event for piece being placed
+    //emit event for piece being placed?
     //TODO Scoring
 }
 

@@ -210,7 +210,7 @@ function getDefaultColorOfPiece(shape){
     return PIECE_COLOR_MAP[shape]
 }
 
-export class Piece {
+export class Piece extends EventTarget{
     constructor({
         shape,
         activeCanvas,
@@ -222,6 +222,8 @@ export class Piece {
         availableCanvases,
         spawnPoint,
     }){
+
+        super()
         this.blocksList = []
         Object.assign(this, {shape, activeCanvas, gameStateGrid, blockSize, positionOfCenterBlock, orientation, shadowEnabled, availableCanvases, spawnPoint})
         this.spawnBlocks()
@@ -232,7 +234,6 @@ export class Piece {
         this.isActive = true
         /// TODO Grace system
         this.grace = 5
-
     }
 
     spawnBlocks(){
@@ -302,34 +303,14 @@ export class Piece {
         return offsets
     }
 
-    //TODO- Abstract Piece into an Active piece type and a Shadow piece type.
-    updateShadow(){
-        this?.shadow?.erase()
-        this.shadow = new Piece({
-            shape: this.shape, 
-            activeCanvas: this.activeCanvas, 
-            gameStateGrid: this.gameStateGrid, 
-            blockSize: this.blockSize, 
-            positionOfCenterBlock: this.positionOfCenterBlock, 
-            orientation: this.orientation,
-            spawnPoint: this.spawnPoint
-            })
-        while(this.shadow.attemptTranslate('MOVEDOWN')) {}
-        this.shadow.color = 'lightgray'
-        this.shadow.draw()
-    }
-
-    
-
     //returns true if rotation worked, false if failed
     //TODO Refactor to throw exception that gets handled instead of just returning true/false
     attemptRotate(direction){
-        //Note- this is probably a silly way to do rotation collision checks but it's requires less code for now
         let initialOrientation = this.orientation
         this.rotate(direction)
         let newOrientation = this.orientation 
         if (this.isIllegalPosition()) {
-            //TODO A try-catch here would read a lot better
+            //TODO A try-catch herek would read a lot better
             if(this.attemptKick(initialOrientation, newOrientation) == false){ //if kick failed
                 //any 4 rotations returns to original position, easier than getting opposite direction sorry
                 this.rotate(direction)
@@ -387,9 +368,12 @@ export class Piece {
         const newPosition = this.getNewPositionFrom({action: action, lastPosition: lastPosition})        
         this.translate(newPosition)
         if(options.fromKick){
-            this.draw('green', this.debugCanvas)
+            this.canvas = this.availableCanvases['debugCanvas']
+            this.draw()
             // debugger
-            this.erase(this.debugCanvas)
+            this.erase()
+            this.canvas = this.availableCanvases['activeMino']
+
             this.resetBlockSettings()
         }
         if(this.isIllegalPosition()){
@@ -444,20 +428,25 @@ export class Piece {
 
     //keeps moving down until dropped. 
     //Inputs should be blocked in transit, if transit time not 0
-    hardDrop(){ 
+    fallToBottom(){ 
         while(this.attemptTranslate('MOVEDOWN')){
             //do nothing
-        }
-        this.isActive = false
-        this.placePiece()
-        
+        }        
     }
 
+    hardDrop(){
+        this.fallToBottom()
+        this.isActive = false
+        this.placePiece()
+    }
+
+    //TODO Change which canvas blocks are 'placed' to
     placePiece(){
         this.activeCanvas = this.availableCanvases['placedMinoBoardCanvas']
         this.blocksList.forEach((block) => {
             block.place()
         })
+        this.dispatchEvent(new CustomEvent('onPiecePlaceEvent')); 
     }
 
 
@@ -484,16 +473,17 @@ export class Piece {
         })
     }
 
-    performAction(action){
-        this.erase()
-
+    updateGameStateWithAction(action){
         //TODO This whole thing is inelegant, I should find a way to refresh the page without having to call the piece to render. 
         if (action === 'HOLD') {
             return;
         }
-        //could probably be easily cleaned up but this isn't that bad
         const actions = {
-            'SPAWN': () => {this.attemptTranslate(this.positionOfCenterBlock)},
+            'SPAWN': () => {
+                this.attemptTranslate(this.positionOfCenterBlock)
+                this.dispatchEvent(new CustomEvent('onPieceSpawnEvent', {
+                }));
+            },
             'MOVEDOWN': () => {this.attemptTranslate(action)},
             'MOVELEFT': () => {this.attemptTranslate(action)},
             'MOVERIGHT': () => {this.attemptTranslate(action)},
@@ -506,13 +496,26 @@ export class Piece {
             }
         }
         actions[action]?.call(this)
+    }
 
-        //TODO Find a way to show shadow without calling the method here
-        if(this.shadowEnabled){
-            this.updateShadow() //TODO Change Color
-        }
+    performAction(action){
+        this.erase()
+
+        
+        //could probably be easily cleaned up but this isn't that bad
+        
+        this.updateGameStateWithAction(action)
 
         this.draw()
+
+        this.dispatchEvent(new CustomEvent('onPieceUpdateEvent', {
+            detail: {
+                isActive: this.isActive,
+                action: action,
+                newPosition: this.positionOfCenterBlock,
+                newOrientation: this.orientation
+            }
+        }));
 
     }
 }
