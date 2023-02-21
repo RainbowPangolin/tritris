@@ -65,7 +65,7 @@ describe('7-Bag system', function () {
     let firstShape = board.getUpcomingShape() 
     board.startGame() //now 6 pieces in queue
   
-    assert.equal(board.shapeQueue.length, 6, 'First piece not dequeued on game start')
+    assert.equal(board.pieceQueue.length, 6, 'First piece not dequeued on game start')
     assert.equal(board.activePiece.shape, firstShape, `First shape was not gotten from bag. Current queue: ${board.shapeQueue}`)
   })
 
@@ -74,7 +74,7 @@ describe('7-Bag system', function () {
     board.startGame() //now 6 pieces in queue
     board.placePiece() //now 5 pieces in queue
     board.placePiece() //now 4 + 7 = 11 pieces in queue
-    assert.equal(board.shapeQueue.length, 11, 'New bag was not added correctly')
+    assert.equal(board.pieceQueue.length, 11, 'New bag was not added correctly')
   })
 
 });
