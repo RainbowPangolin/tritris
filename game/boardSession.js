@@ -5,6 +5,7 @@ import {ExtraPieceDrawer} from './extraPieceDrawer.js'
 const DEFAULT_BLOCK_SIZE = 25
 
 export class BoardSession{
+    gameStateGrid = []
     constructor({
         width = 10, 
         height = 22, 
@@ -35,20 +36,19 @@ export class BoardSession{
     }
 
     createGameStateGrid(){
-        let gameStateGrid = []
         for (let i = 0; i < this.height; i++){
             let innerGrid = []
             for( let j = 0; j < this.width; j++){
                 innerGrid.push(0)
             }
-            gameStateGrid.push(innerGrid)
+            this.gameStateGrid.push(innerGrid)
         }
         let floorArr = []
         for (let i = 0; i < this.width; i++){
             floorArr.push(1)
         }
-        gameStateGrid.push(floorArr)
-        this.gameStateGrid = gameStateGrid
+        this.gameStateGrid.push(floorArr)
+        // this.gameStateGrid = gameStateGrid
     }
 
     initializeGameSettings(){

@@ -17,7 +17,7 @@ describe('Debug Bag System', function () {
   const testBag = ['T','L', 'J','S','I','Z','O']
   const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     let board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document,
       bagSystem: testBag
@@ -36,7 +36,7 @@ describe('7-Bag system', function () {
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document,
       bagSystem: '7-bag'
@@ -83,7 +83,7 @@ describe('Shadowpiece color', function () {
   it("should be different from the parent piece's color", function () {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     let board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document
     })
@@ -101,7 +101,7 @@ describe('Kick table', function () {
   it("should allow pieces to kick without throwing errors", function () {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     let board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document
     })
@@ -116,7 +116,7 @@ describe('Hold piece function', function () {
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document,
       bagSystem: ['T','L', 'J','S','I','Z','O']
@@ -145,7 +145,7 @@ describe('Hold piece display', function() {
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document,
       bagSystem: ['T','L', 'J','S','I','Z','O']
@@ -165,17 +165,38 @@ describe('Placing Blocks', function() {
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document,
       bagSystem: ['T','L', 'J','S','I','Z','O']
     })
     board.startGame()
-    board.swapHeldAndActivePieces()
+    board.receiveInput('HARDDROP')
   })
 
   it('Should place blocks onto the internal grid', function() {
+    //Remember that the bottom of the grid is all 1's for collision checking. 
+    //Checks that the positions of the T piece are all filled
+    assert.ok(board.gameStateGrid[board.height-1][4])
+    assert.ok(board.gameStateGrid[board.height-1][3])
+    assert.ok(board.gameStateGrid[board.height-1][5])
+    assert.ok(board.gameStateGrid[board.height-2][4])
 
+    //Check some ran
+
+    for(let x = 0; x < board.width; x++){
+      for (let y = 0; y < board.height - 1; y++){
+        if(
+          ((x == 3) || (x == 4) || (x == 5) )
+          &&
+          ((y == board.height - 1) || (y == board.height - 2))
+        ){
+          continue
+        }
+        assert.ok(board.gameStateGrid[y][x] == 0, `Extra block placed: x: ${x}, y: ${y}, placed: ${board.gameStateGrid[y][x]}`)
+
+      }
+    }
   })
 })
 
@@ -184,7 +205,7 @@ describe('Clearing Lines', function() {
   beforeEach(() => {
     const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     board = new BoardSession({
-      width: 9,
+      width: 10,
       height: 22,
       domDocument: dom.window.document,
       bagSystem: ['I','I', 'O','S','I','Z','O']
