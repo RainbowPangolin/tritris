@@ -37,6 +37,16 @@ export class Block {
         ctx.clearRect(x * this.blockSize, y * this.blockSize, this.blockSize , this.blockSize);
     }
 
+    delete(){
+        let [y,x] = this.getAbsolutePosition()
+        this.grid[y][x] = 0
+        this.erase()
+    }
+
+    setPositionOneTileDown(){
+        this.positionOfCenterBlock[0] = this.positionOfCenterBlock[0]+1
+    }
+
     place(){ //places block in current, final position
         let [y,x] = this.getAbsolutePosition()
         this.isActive = false

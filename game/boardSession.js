@@ -1,6 +1,7 @@
 import {ActivePiece} from './activePiece.js'
 import {generateNewBagUsing} from './bagSystem.js'
 import {ExtraPieceDrawer} from './extraPieceDrawer.js'
+import {Block} from './block.js'
 
 const DEFAULT_BLOCK_SIZE = 25
 
@@ -151,11 +152,73 @@ export class BoardSession{
     }
 
     handlePiecePlacedEvent(){
+        this.clearFilledLines()
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
         this.activePiece.removeEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
         this.activePiece.removeEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
+    }
 
+    clearFilledLines(){
+        let lines = this.gameStateGrid
+        lines.forEach((line, depth) => {
+            if (this.lineFilled(line)){
+                this.clearLineAtHeight(depth)
+            }
+        })
+        this.refreshPlacedMinoBoard()
+    }
+
+    lineFilled(tileArray){
+        for (let tile of tileArray) {
+            if (typeof tile === 'number') {
+                return false
+            }
+        }
+        return true
+    }
+
+    clearLineAtHeight(depth){
+        let tileArray = this.gameStateGrid[depth]
+        tileArray.forEach((block) => {
+            block.delete()
+        })
+
+        //FUTURE REFERENCE- I might want to consider using a 'fail-zone'
+
+        //Also a recursive solution might look neater
+        for (let i = depth; i >= 0; i--){
+            let curLine = this.gameStateGrid[i]
+            curLine.forEach((block) => {
+                if (block instanceof Block){
+                    block.setPositionOneTileDown()
+                }
+            })
+        }
+        
+        //removes last line
+        this.gameStateGrid.splice(depth, 1)
+
+        this.pushNewLineToTop()
+    }
+
+    pushNewLineToTop(){
+        let newLine = []
+        for (let i = 0; i < this.width; i++){
+            newLine.push(0)
+        }
+        this.gameStateGrid.unshift(newLine)
+    }
+
+    refreshPlacedMinoBoard(){
+        this.clearPlacedDisplay()
+        for (let line of this.gameStateGrid){
+            for(let tile of line){
+                if(tile instanceof Block){
+                    tile.draw()
+                }
+            }
+        }
     }
 
     handlePieceHeldEvent(){
@@ -176,6 +239,12 @@ export class BoardSession{
     
     clearActiveDisplay(){
         let canvas = this.activeMinoBoardCanvas
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    clearPlacedDisplay(){
+        let canvas = this.placedMinoBoardCanvas
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
     }

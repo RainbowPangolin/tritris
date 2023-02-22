@@ -74,9 +74,6 @@ export class Piece extends EventTarget{
         })
     }
 
-
-
-
     applyBlockOffsets(){
         // this.blocksList[0].centerOffset = [0,0]
         let offsetsList = this.getBlockOffsets(this.shape, this.orientation)
