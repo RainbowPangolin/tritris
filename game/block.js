@@ -6,7 +6,7 @@ export class Block {
         grid, 
         blockSize,
         positionOfCenterBlock, 
-        color}
+        color} = {}
         ){
         Object.assign(this, {canvas, grid, blockSize, positionOfCenterBlock, color})
         this.defaults =  {canvas, grid, blockSize, positionOfCenterBlock, color}

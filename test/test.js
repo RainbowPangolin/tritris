@@ -2,6 +2,7 @@ import {BoardSession } from '../game/boardSession.js';
 import jsdom from"jsdom";
 import {CustomEventMock} from "./customEventMock.js"
 import assert from 'node:assert';
+import {Block} from '../game/block.js'
 
 const { JSDOM } = jsdom;
 
@@ -177,6 +178,7 @@ describe('Placing Blocks', function() {
   it('Should place blocks onto the internal grid', function() {
     //Remember that the bottom of the grid is all 1's for collision checking. 
     //Checks that the positions of the T piece are all filled
+    //TODO Might be worth refactoring the test to use the new checkActualVsExpectedLine()
     assert.ok(board.gameStateGrid[board.height-1][4])
     assert.ok(board.gameStateGrid[board.height-1][3])
     assert.ok(board.gameStateGrid[board.height-1][5])
@@ -213,8 +215,34 @@ describe('Clearing Lines', function() {
     board.startGame()
   }) 
 
-  it('Should clear a line', function() {
-
+  it('Should not clear a line after non clearing placements', function() {
+    let mockBlock = new Block()
+    board.receiveInput('HARDDROP')
+    assert.ok(isActualVsExpectedLineSame(board.gameStateGrid[21], [0,0,0,mockBlock,mockBlock,mockBlock,mockBlock,0,0,0]))
   })
 
+  it('Should clear a line after a clearing placement', function() {
+    let mockBlock = new Block()
+    board.receiveTheArrayOfInputs(['MOVELEFT','MOVELEFT','MOVELEFT', 'HARDDROP', 'MOVERIGHT','MOVERIGHT','MOVERIGHT','HARDDROP','HARDDROP'])
+    assert.ok(isActualVsExpectedLineSame(board.gameStateGrid[21], [0,0,0,0,mockBlock,mockBlock,0,0,0,0]))
+  })
 })
+
+//NOTE- Only checks if Block objects are present, does not check color or any other property.
+function isActualVsExpectedLineSame(actualLineArray, expectedLineArray){
+
+  for (let i = 0; i < actualLineArray.length; i++){
+    // console.log(typeof actualLineArray[i], typeof expectedLineArray[i])
+
+    let same = true
+
+    if(typeof actualLineArray[i] != typeof  expectedLineArray[i]){
+      same = false
+    }
+    if(!same){
+      return false
+    }
+  }
+
+  return true
+}
