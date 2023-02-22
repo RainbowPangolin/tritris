@@ -7,7 +7,7 @@ function getDefaultColorOfPiece(shape){
 }
 
 export class Piece extends EventTarget{
-    //TODO This looks stupid alone here, I should probably make everything consistent
+    //TODO These private fields are a little silly, I should take some time to make these more sensible later. 
     #activeCanvas
     #color
     constructor({
@@ -75,7 +75,6 @@ export class Piece extends EventTarget{
     }
 
     applyBlockOffsets(){
-        // this.blocksList[0].centerOffset = [0,0]
         let offsetsList = this.getBlockOffsets(this.shape, this.orientation)
         this.blocksList.forEach( 
             (block, index) => {
@@ -105,7 +104,7 @@ export class Piece extends EventTarget{
         this.rotate(direction)
         let newOrientation = this.orientation 
         if (this.isIllegalPosition()) {
-            //TODO A try-catch herek would read a lot better
+            //TODO A try-catch here would read a lot better
             if(this.attemptKick(initialOrientation, newOrientation) == false){ //if kick failed
                 //any 4 rotations returns to original position, easier than getting opposite direction sorry
                 this.rotate(direction)
@@ -118,7 +117,6 @@ export class Piece extends EventTarget{
     }
 
     rotate(direction){
-        //change orientation based on rotation
         if(direction == 'ROTATERIGHT'){
             this.orientation = (4 + (this.orientation + 1)) % 4 
         } else if (direction == 'ROTATELEFT') {
@@ -295,7 +293,6 @@ export class Piece extends EventTarget{
     }
 
     performAction(action){
-        // this.erase()
         //could probably be easily cleaned up but this isn't that bad
         this.updateGameStateWithAction(action)
         if(action == 'HOLD'){
@@ -309,8 +306,5 @@ export class Piece extends EventTarget{
                 newOrientation: this.orientation
             }
         }));
-
-
-        // this.draw()
     }
 }

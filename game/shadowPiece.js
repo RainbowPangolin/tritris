@@ -28,8 +28,6 @@ export class ShadowPiece extends Piece{
     }
 
     handleUpdateEvent(event){
-        // this.eraseCurrentShadow()
-
         if(!event.detail.isActive){
             return
         }
@@ -39,7 +37,6 @@ export class ShadowPiece extends Piece{
         this.orientation = parentOrientation
         this.applyBlockOffsets()   
         this.fallToBottom()
-        // this.draw()
     }
 
     eraseCurrentShadow(){
