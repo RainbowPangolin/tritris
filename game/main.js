@@ -7,8 +7,6 @@ let playerBoard = new BoardSession({
     bagSystem: '7-bag'
 })
 
-playerBoard.startGame()
-
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'k':
@@ -35,6 +33,16 @@ document.addEventListener("keydown", (event) => {
         case ' ':
             playerBoard.receiveInput('HARDDROP')
             break
+        case 't':
+            playerBoard.receiveInput('START')
+            break   
+        case 'y':
+            playerBoard.receiveInput('END')
+            break 
+        case 'r':
+            playerBoard.receiveInput('RESTART')
+            break                   
+
     }
     
 })

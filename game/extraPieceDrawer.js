@@ -28,6 +28,10 @@ export class ExtraPieceDrawer{
         heldPiece.draw()
     }
 
+    clearHeldPieceDisplay(){
+        this.clearCanvas(this.availableCanvases['heldPieceCanvas'])
+    }
+
     setNewPreviewsTo(arrayOfPieces){
         arrayOfPieces.forEach((shape, index) => {
             let curCanvas = this.availableCanvases['previewCanvasList'][index] 

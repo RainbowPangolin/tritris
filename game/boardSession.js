@@ -2,10 +2,14 @@ import {ActivePiece} from './activePiece.js'
 import {generateNewBagUsing} from './bagSystem.js'
 import {ExtraPieceDrawer} from './extraPieceDrawer.js'
 import {Block} from './block.js'
+import {PIECE_ACTIONS, MISC_ACTIONS} from './constants.js'
 
 const DEFAULT_BLOCK_SIZE = 25
 
-export class BoardSession{
+
+
+export class BoardSession extends EventTarget{
+    gameOngoing
     gameStateGrid = []
     constructor({
         width = 10, 
@@ -18,8 +22,9 @@ export class BoardSession{
         pieceQueue = [],
         spawnPoint = [2, Math.floor(width/2) - 1]
     } = {}){ 
+        super()
         Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint})
-        this.createGameStateGrid()
+        this.creatFreshGameStateGrid()
         this.initializeGameSettings()
         this.initializeCanvasDisplay()
         this.initializeExtraPieceDrawer()
@@ -36,7 +41,8 @@ export class BoardSession{
         this.extraPieceDrawer.heldBlockSize = this.blockSize
     }
 
-    createGameStateGrid(){
+    creatFreshGameStateGrid(){
+        this.gameStateGrid = []
         for (let i = 0; i < this.height; i++){
             let innerGrid = []
             for( let j = 0; j < this.width; j++){
@@ -121,8 +127,34 @@ export class BoardSession{
     }
 
     startGame(){
+        if (this.gameOngoing){
+            return
+        }
+        this.gameOngoing = true
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
+    }
+
+    //TODO Block inputs here.
+    endGame(){
+        if(!this.gameOngoing){
+            return
+        }
+        this.gameOngoing = false
+    }
+
+    restartGame(){
+        this.gameOngoing = false
+        this.activePiece = null
+        this.pieceQueue = []
+        this.heldPiece = null
+        this.clearHeldPieceDisplay()
+        this.clearActiveDisplay()
+        this.clearPlacedDisplay()
+        this.creatFreshGameStateGrid()
+
+        this.addRequiredBags()
+        this.performBoardAction('START')
     }
 
     changeGravity(gravity){
@@ -130,36 +162,63 @@ export class BoardSession{
     }
     
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
-        let activePiece = new ActivePiece({
-            shape: shape, 
-            activeCanvas: this.activeMinoBoardCanvas, 
-            gameStateGrid: this.gameStateGrid, 
-            blockSize: this.blockSize, 
-            positionOfCenterBlock: location, 
-            orientation: 0, 
-            shadowEnabled: this.shadowEnabled,
-            availableCanvases: {//TODO Possibly just dissolve this object?
-                'activeMinoBoardCanvas': this.activeMinoBoardCanvas, 
-                'debugCanvas': this.debugCanvas,
-                'placedMinoBoardCanvas': this.placedMinoBoardCanvas,
-            }, 
-            spawnPoint: this.spawnPoint
-        })
-        this.activePiece = activePiece
-        this.activePiece.performAction('SPAWN')
-        this.activePiece.addEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
-        this.activePiece.addEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
-        this.activePiece.addEventListener('onPieceTransformEvent', this.handleActivePieceTransformEvent.bind(this))
+        try{
+            let activePiece = new ActivePiece({
+                shape: shape, 
+                activeCanvas: this.activeMinoBoardCanvas, 
+                gameStateGrid: this.gameStateGrid, 
+                blockSize: this.blockSize, 
+                positionOfCenterBlock: location, 
+                orientation: 0, 
+                shadowEnabled: this.shadowEnabled,
+                availableCanvases: {//TODO Possibly just dissolve this object?
+                    'activeMinoBoardCanvas': this.activeMinoBoardCanvas, 
+                    'debugCanvas': this.debugCanvas,
+                    'placedMinoBoardCanvas': this.placedMinoBoardCanvas,
+                }, 
+                spawnPoint: this.spawnPoint
+            })
+            this.activePiece = activePiece
+            this.activePiece.performAction('SPAWN')
+            this.activePiece.addEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
+            this.activePiece.addEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
+            this.activePiece.addEventListener('onPieceTransformEvent', this.handleActivePieceTransformEvent.bind(this))
 
+        } catch (error) {
+            this.activePiece = null
+        }
         this.refreshActiveMinoBoard()
+
     }
 
     handlePiecePlacedEvent(){
         this.clearFilledLines()
+
+        if(this.hasMetFailCondition()){
+            console.log('poo')
+
+            return}
+        
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
-        this.activePiece.removeEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
-        this.activePiece.removeEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
+
+    }
+
+    hasMetFailCondition(){ 
+    if(!this.isLineEmpty(this.gameStateGrid[2])){
+        //TODO Why do I have these as events again?
+        this.performBoardAction('END')
+    }
+
+    }
+
+    isLineEmpty(line){
+        for (let tile of line){
+            if (tile != 0){
+                return false
+            }
+        }
+        return true
     }
 
     clearFilledLines(){
@@ -187,7 +246,9 @@ export class BoardSession{
 
     refreshActiveMinoBoard(){
         this.clearActiveDisplay()
-        this.activePiece.draw()
+        if (this.gameOngoing){
+            this.activePiece.draw()
+        }
     }
 
     clearLineAtHeight(depth){
@@ -246,7 +307,37 @@ export class BoardSession{
 
     //TODO This is inelegant, there is probably a smarter way of doing this.
     receiveInput(action = 'MOVEDOWN'){
-        this.activePiece.performAction(action)
+        if(PIECE_ACTIONS.has(action)){
+            if(this.gameOngoing){
+                this.activePiece.performAction(action)
+            }
+        } else if (MISC_ACTIONS.has(action)){
+            this.performBoardAction(action)
+        } else {
+            throw new Error('Illegal action attempted')
+        }
+    }
+
+    performBoardAction(action){
+        const actions = {
+            'START': () => {
+                this.dispatchEvent(new CustomEvent('onStartGameEvent', {}))
+                console.log("Attempting start")
+                this.startGame()
+
+            }, 
+            'END': () => {
+                this.dispatchEvent(new CustomEvent('onEndGameEvent', {}));
+                console.log("Attempting end")
+                this.endGame()
+            },
+            'RESTART': () => {
+                this.dispatchEvent(new CustomEvent('onRestartGameEvent', {}))
+                console.log("Attempting restart")
+                this.restartGame()
+            },
+        }
+        actions[action]?.call(this)
     }
     
     clearActiveDisplay(){
@@ -280,6 +371,10 @@ export class BoardSession{
     }
     updateHeldPieceDisplay(){
         this.extraPieceDrawer.setShapeToDisplayHeld(this.heldPiece.shape)
+    }
+
+    clearHeldPieceDisplay(){
+        this.extraPieceDrawer.clearHeldPieceDisplay()
     }
 
     removeNextPieceFromQueue(stepsAhead = 0){

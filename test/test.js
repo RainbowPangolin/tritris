@@ -246,3 +246,40 @@ function isActualVsExpectedLineSame(actualLineArray, expectedLineArray){
 
   return true
 }
+
+describe('Failing game', function () {
+  let board
+  beforeEach(() => {
+    const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+    board = new BoardSession({
+      width: 10,
+      height: 22,
+      domDocument: dom.window.document,
+      bagSystem: ['T','L', 'J','S','I','Z','O']
+    })
+    board.startGame()
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+    board.receiveInput('HARDDROP')
+  })
+
+
+  it('should fail when pieces go above fail point', function (){
+    assert.notEqual(board.activePiece?.shape, 'S')
+    assert.equal(board.gameOngoing, false, 'Game ongoing even though it should be over!')
+  })
+
+})
+
+describe('Restarting game', function () {
+  //TODO
+})

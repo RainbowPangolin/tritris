@@ -276,6 +276,9 @@ export class Piece extends EventTarget{
             }, 
             'SPAWN': () => {
                 this.translate(this.spawnPoint)
+                if(this.isIllegalPosition()){
+                    throw new Error("Spawnpoint blocked")
+                }
                 this.dispatchEvent(new CustomEvent('onPieceSpawnEvent', {}));
             },
             'MOVEDOWN': () => {this.attemptTranslate(action)},

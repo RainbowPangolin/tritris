@@ -146,8 +146,6 @@ export const PIECE_COLOR_MAP = {
     "O": 'yellow'
 }
 
-
-
 let u, v 
 export const KICK_TABLE = {
     //see Tetris Guideline SRS kick data table https://tetris.fandom.com/wiki/SRS
@@ -205,3 +203,29 @@ export const KICK_TABLE = {
     },
 
 }
+
+export const PIECE_ACTIONS = new Set()
+let pieceActionsArray = [
+    'MOVELEFT', 
+    'MOVERIGHT',
+    'MOVEDOWN',
+    'HARDDROP',
+    'ROTATELEFT',
+    'ROTATERIGHT',
+    'ROTATE180',
+    'HOLD',
+    'SPAWN',
+]
+pieceActionsArray.forEach( (action) => {
+    PIECE_ACTIONS.add(action)
+})
+
+export const MISC_ACTIONS = new Set()
+let miscActionsArray = [
+    'START',
+    'END',
+    'RESTART'
+]
+miscActionsArray.forEach( (action) => {
+    MISC_ACTIONS.add(action)
+})
