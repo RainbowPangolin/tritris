@@ -24,8 +24,8 @@ export class ExtraPieceDrawer{
             availableCanvases: [curCanvas],
             spawnPoint: [1,1]
         })
-
         heldPiece.performAction('SPAWN')
+        heldPiece.draw()
     }
 
     setNewPreviewsTo(arrayOfPieces){
@@ -44,6 +44,7 @@ export class ExtraPieceDrawer{
                 spawnPoint: [1,1]
             })
             queuePiece.performAction('SPAWN')
+            queuePiece.draw()
         })
     }
 

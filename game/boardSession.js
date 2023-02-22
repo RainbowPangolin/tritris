@@ -149,6 +149,9 @@ export class BoardSession{
         this.activePiece.performAction('SPAWN')
         this.activePiece.addEventListener('onPiecePlacedEvent', this.handlePiecePlacedEvent.bind(this))
         this.activePiece.addEventListener('onPieceHeldEvent', this.handlePieceHeldEvent.bind(this))
+        this.activePiece.addEventListener('onPieceTransformEvent', this.handleActivePieceTransformEvent.bind(this))
+
+        this.refreshActiveMinoBoard()
     }
 
     handlePiecePlacedEvent(){
@@ -176,6 +179,15 @@ export class BoardSession{
             }
         }
         return true
+    }
+
+    handleActivePieceTransformEvent(){
+        this.refreshActiveMinoBoard()
+    }
+
+    refreshActiveMinoBoard(){
+        this.clearActiveDisplay()
+        this.activePiece.draw()
     }
 
     clearLineAtHeight(depth){

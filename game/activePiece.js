@@ -32,7 +32,15 @@ export class ActivePiece extends Piece{
     }
 
     addNewShadow(newPiece){
-        this.addEventListener('onPieceUpdateEvent', newPiece.handleUpdateEvent.bind(newPiece));
+        this.addEventListener('onPieceTransformEvent', newPiece.handleUpdateEvent.bind(newPiece));
         this.shadowPiece = newPiece
     }
+
+    draw(){
+        this.shadowPiece.draw()
+        this.blocksList.forEach( (block) => {
+            block.draw()
+        })
+    }
+
 }

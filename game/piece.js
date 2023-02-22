@@ -295,13 +295,13 @@ export class Piece extends EventTarget{
     }
 
     performAction(action){
-        this.erase()
+        // this.erase()
         //could probably be easily cleaned up but this isn't that bad
         this.updateGameStateWithAction(action)
         if(action == 'HOLD'){
             return
         }
-        this.dispatchEvent(new CustomEvent('onPieceUpdateEvent', {
+        this.dispatchEvent(new CustomEvent('onPieceTransformEvent', {
             detail: {
                 isActive: this.isActive,
                 action: action,
@@ -311,6 +311,6 @@ export class Piece extends EventTarget{
         }));
 
 
-        this.draw()
+        // this.draw()
     }
 }
