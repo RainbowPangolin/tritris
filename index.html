@@ -4,63 +4,69 @@
     <meta charset="utf-8" />
     <title>x</title>
     <style>
-      * {
-        padding: 0;
-        margin: 0;
+      body {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+        /* grid-auto-rows: 1fr; */
+        grid-gap: 0;
       }
       canvas {
-        /* background: #eee; */
+        /* width: 100%; */
+        /* height: 100%; */
+        object-fit: contain;
+      }
+      div > canvas {
         position: absolute;
         display: block;
         margin: 0 auto;
       }
       /* TODO- Add a background and stuff */
-      canvas.placedMinoCanvas{
-        /* background: #eee; */
+      /* canvas.placedMinoCanvas{
         position: absolute;
         display: block;
         margin: 0 auto;
       }
       canvas.activeMinoCanvas{
-        /* background: #eee; */
         position: absolute;
         display: block;
         margin: 0 auto;
       }
       canvas.miscCanvas{
-        /* background: #eee; */
         position: absolute;
         display: block;
         margin: 0 auto;
-      }
+      }*/
       canvas.backGround{
         background: #eee;
-        position: absolute;
+        /* position: absolute; */
+        /* display: block; */
+        /* margin: 0 auto; */
+      } 
+      /* canvas.debugCanvas {
         display: block;
         margin: 0 auto;
-      }
-      canvas.debugCanvas {
-        /* background: #F00; */
-        display: block;
-        margin: 0 auto;
-      }
+      } */
       canvas.previewCanvas{
         position: relative;
         background: #FEE;
-        display: block;
-        margin: 0 auto;
+        /* display: block;
+        margin: 0 auto; */
       }
       canvas.heldPieceCanvas{
         position: relative;
         background: #EFE;
-        display: block;
-        margin: 0 auto;
+        /* display: block;
+        margin: 0 auto; */
+      }
+
+      button {
+        position: relative
       }
     </style>
   </head>
   <body>
 
-    <canvas class="backGround" width = 250 height= 550></canvas>
+    <!-- <canvas class="backGround" width = 250 height= 550></canvas> -->
     <script type="module" src="/game/main.js" >
       // JavaScript code goes here
     </script>

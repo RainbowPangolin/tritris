@@ -25,10 +25,37 @@ export class BoardSession extends EventTarget{
         super()
         Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint})
         this.creatFreshGameStateGrid()
-        this.initializeGameSettings()
+        this.initializeGameState()
         this.initializeCanvasDisplay()
         this.initializeExtraPieceDrawer()
+        this.initializeHUD()
         this.addRequiredBags()
+    }
+
+    //TODO Maybe break this up into a new class
+    initializeHUD(){
+
+        let buttonContainerDiv = this.domDocument.createElement("div");
+        let startButton = this.domDocument.createElement("button");
+        startButton.addEventListener('click', () => {
+            this.performBoardAction('START')
+        })
+        startButton.innerHTML = 'Start Game'
+        buttonContainerDiv.append(startButton)
+
+        let restartButton = this.domDocument.createElement("button");
+        restartButton.addEventListener('click', () => {
+            this.performBoardAction('RESTART')
+        })
+        restartButton.innerHTML = 'Restart Game'
+        buttonContainerDiv.append(restartButton)
+
+        let scoreDisplay = this.domDocument.createElement("p");
+        this.scoreDisplay = scoreDisplay
+        buttonContainerDiv.append(scoreDisplay)
+
+        this.domDocument.body.append(buttonContainerDiv)
+
     }
 
     initializeExtraPieceDrawer(){
@@ -58,8 +85,9 @@ export class BoardSession extends EventTarget{
         // this.gameStateGrid = gameStateGrid
     }
 
-    initializeGameSettings(){
+    initializeGameState(){
         //does nothing?
+        this.linesCleared = 0
     }
 
     //TODO This might be worth refactoring to be less dumb
@@ -71,12 +99,19 @@ export class BoardSession extends EventTarget{
         this.debugCanvas = this.getNewCanvas()
         this.heldPieceCanvas = this.getNewCanvas({type: 'heldPieceCanvas'})
 
-        
-        this.domDocument.body.append(this.placedMinoBoardCanvas) 
-        this.domDocument.body.append(this.debugCanvas)
-        this.domDocument.body.append(this.activeMinoBoardCanvas)
+        let mainCanvasDiv = this.domDocument.createElement('div')
+
+        let backgroundCanvas = this.getNewCanvas()
+        backgroundCanvas.style.background = '#eee'
+        mainCanvasDiv.append(backgroundCanvas)
+
+        mainCanvasDiv.style.width = String(this.width*this.blockSize+'px')
+        mainCanvasDiv.append(this.placedMinoBoardCanvas) 
+        mainCanvasDiv.append(this.debugCanvas)
+        mainCanvasDiv.append(this.activeMinoBoardCanvas)
+
+        this.domDocument.body.append(mainCanvasDiv)
         //Equivalent call for previewCanvases called in getNewPreviewCanvases
-        this.domDocument.body.append(this.heldPieceCanvas) 
 
         this.debugCanvas.classList.add('debugCanvas')
         this.placedMinoBoardCanvas.classList.add('placedMinoCanvas')
@@ -85,6 +120,9 @@ export class BoardSession extends EventTarget{
         this.heldPieceCanvas.classList.add('heldPieceCanvas')
 
         this.previewCanvasList = this.getNewPreviewCanvases()
+
+        this.previewCanvasDiv.prepend(this.heldPieceCanvas) 
+
 
 
     }
@@ -106,12 +144,16 @@ export class BoardSession extends EventTarget{
 
     getNewPreviewCanvases(){
         let listOfPreviewCanvases = []
+        let previewCanvasDiv = this.domDocument.createElement("div");
         for (let i = 0; i < this.previewSize; i++){
             let newPreviewCanvas = this.getNewCanvas({type: 'previewCanvas'})
             listOfPreviewCanvases.push(newPreviewCanvas)
-            this.domDocument.body.append(newPreviewCanvas) 
+            previewCanvasDiv.append(newPreviewCanvas) 
             newPreviewCanvas.classList.add('previewCanvas')
         }
+
+        this.domDocument.body.append(previewCanvasDiv)
+        this.previewCanvasDiv = previewCanvasDiv
         return listOfPreviewCanvases
     }
 
@@ -127,6 +169,8 @@ export class BoardSession extends EventTarget{
     }
 
     startGame(){
+        this.scoreDisplay.innerHTML = this.linesCleared
+
         if (this.gameOngoing){
             return
         }
@@ -144,6 +188,7 @@ export class BoardSession extends EventTarget{
     }
 
     restartGame(){
+        this.linesCleared = 0
         this.gameOngoing = false
         this.activePiece = null
         this.pieceQueue = []
@@ -193,11 +238,13 @@ export class BoardSession extends EventTarget{
 
     handlePiecePlacedEvent(){
         this.clearFilledLines()
+        this.scoreDisplay.innerHTML = this.linesCleared
+
 
         if(this.hasMetFailCondition()){
-            console.log('poo')
-
-            return}
+            console.log('FAIL')
+            return
+        }
         
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
@@ -226,6 +273,8 @@ export class BoardSession extends EventTarget{
         lines.forEach((line, depth) => {
             if (this.lineFilled(line)){
                 this.clearLineAtHeight(depth)
+                this.linesCleared += 1
+                
             }
         })
         this.refreshPlacedMinoBoard()

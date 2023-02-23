@@ -232,10 +232,7 @@ describe('Clearing Lines', function() {
 function isActualVsExpectedLineSame(actualLineArray, expectedLineArray){
 
   for (let i = 0; i < actualLineArray.length; i++){
-    // console.log(typeof actualLineArray[i], typeof expectedLineArray[i])
-
     let same = true
-
     if(typeof actualLineArray[i] != typeof  expectedLineArray[i]){
       same = false
     }
