@@ -32,7 +32,7 @@ function connectToServer(){
 
 function ping(socket, id){
     const payload = { name: "ping!", id: id };
-    const message = { messageType: "ping", payload: payload}
+    const message = { messageType: "ping", rawMessage: payload}
     socket.send(JSON.stringify(message));
 }
 

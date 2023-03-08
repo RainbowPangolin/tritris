@@ -1,28 +1,28 @@
 package dstris;
 
-// import com.fasterxml.jackson.annotation.JsonSubTypes;
-// import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-// @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "messageType")
-// @JsonSubTypes({
-//     @JsonSubTypes.Type(value = Ping.class, name = "ping"),
-// })
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class TrisMessage {
     public String messageType;
-    // @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "messageType")
-    public Object payload;
+    public JsonNode rawMessage;
 
-    public TrisMessage(String messageType, Object payload){
-        this.messageType = messageType;
-        this.payload = payload;
+    public TrisMessage(){
+
     }
 
-    public Object getPayload(){
-        return this.payload;
+    public Object getmessage(){
+        return this.rawMessage;
+    }
+
+    public void setMessage(JsonNode rawMessage) {
+        this.rawMessage = rawMessage;
     }
 
     public String getMessageType(){
         return this.messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }
