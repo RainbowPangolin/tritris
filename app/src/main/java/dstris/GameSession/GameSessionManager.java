@@ -1,20 +1,27 @@
 package dstris.GameSession;
 
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+// import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import dstris.myStructs.TrisClient;
 
 //A bean. Contains all active rooms at all times.
-@Component
+@Component("gameSessionManager")
+@Scope("singleton")
 public class GameSessionManager {
     private Map<TrisClient, String> clientIdToGameSessionIdMap = new HashMap<>();
     private Map<String, String> connectionIdToGameSessionIdMap = new HashMap<>();
     private Map<String, GameSession> IdToGameSessionMap = new HashMap<>();
+
+    public GameSessionManager(){
+        System.out.println(" --- GameSessionManager instantiated by Spring");
+
+    }
     
     public void assignClientToRoom(TrisClient client, String roomID){
         if (!(IdToGameSessionMap.containsKey(roomID))){

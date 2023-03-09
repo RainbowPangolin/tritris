@@ -19,11 +19,15 @@ public class TrisClient {
         this.assignedRoom = roomID;
     }
 
-    public String getAssignedRoom(){
-        return this.assignedRoom;
+    public String getRequestedRoom(){
+        return this.requestedRoom;
+    } 
+    
+    public PlayerInfo getPlayer(){
+        return this.player;
     }
 
-    public String getRequestedRoom(){
+    public String getAssignedRoom(){
         return this.assignedRoom;
     }
 

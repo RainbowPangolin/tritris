@@ -1,62 +1,26 @@
 package dstris;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import dstris.GameSession.GameSession;
-
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.CloseStatus;
-import java.util.ArrayList;
-import java.util.List;
 
 // import java.io.IOException;
 
 @Configuration
+@ComponentScan("dstris")
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
+    @Autowired
+    private WebSocketHandler handler;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketHandler(), "/game").setAllowedOrigins("*");
+        registry.addHandler(handler, "/game").setAllowedOrigins("*");
     }
 
-    private static class WebSocketHandler extends TextWebSocketHandler {
-
-        private List<WebSocketSession> sessions = new ArrayList<>();
-        private List<GameSession> rooms = new ArrayList<>();
-        // private GameSessionManager roomManager = new GameSessionManager();
-        private PayloadValidator validator = new PayloadValidator();
-        private PayloadHandler handler = new PayloadHandler();
-
-        @Override
-        public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-            sessions.add(session);
-        }
-
-        @Override
-        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-            sessions.remove(session);
-        }
-
-        @Override
-        public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-            // Handle incoming messages from the client
-            String payload = message.getPayload();
-
-            System.out.println("Received message: " + payload);
-            
-            if (this.validator.isValid(payload)) {
-                // GameSession room = this.roomManager.getSessionAssociatedWith(sessionID);
-                this.handler.handle(session, payload);
-            } else {
-                System.out.println("ERROR: ILLEGAL PAYLOAD: " + payload);
-            }
-
-        }
-    }
+   
 }

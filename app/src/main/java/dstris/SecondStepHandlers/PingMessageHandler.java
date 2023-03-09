@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -16,6 +17,7 @@ import dstris.myStructs.Ping;
 
 
 //TODO Switch to static methods and call class directly rather than instantiating?
+@Component
 public class PingMessageHandler implements CustomMessageHandlerInterface {
     private ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
@@ -27,7 +29,7 @@ public class PingMessageHandler implements CustomMessageHandlerInterface {
             broadcastMessageFromConnection(rawMessage, connection);
         } catch (Throwable t) {
             // Handle the error or exception
-            System.err.println("An error occurred at step 2 of message processing: " + t.getMessage());
+            System.err.println("PingMessageHandler: An error occurred at step 2 of message processing: " + t.getMessage());
         }
 
     
