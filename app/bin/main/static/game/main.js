@@ -7,6 +7,10 @@ let playerBoard = new BoardSession({
     bagSystem: '7-bag'
 })
 
+playerBoard.addEventListener('onStartGameEvent', () => {
+    console.log('game started')
+})
+
 document.addEventListener("keydown", (event) => {
     switch(event.key){
         case 'k':
