@@ -1,4 +1,4 @@
-package dstris;
+package dstris.myStructs;
 
 public class Ping {
     public String name;

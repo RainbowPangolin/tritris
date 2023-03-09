@@ -11,6 +11,7 @@ function connectToServer(){
     // Wait for the connection to be established
     socket.onopen = function(event) {
     console.log('WebSocket connection established');
+    connectToRoom('ABCD');
     };
 
     // Handle incoming messages from the server
@@ -30,10 +31,16 @@ function connectToServer(){
     
 }
 
+function connectToRoom(roomID){
+    const playerInfo = {name: 'playerName', id: 'playerID', roomID: roomID}
+    const trisMessage = { messageType: "roomnegotiation", rawMessage: playerInfo}
+    socket.send(JSON.stringify(trisMessage));
+}
+
 function ping(socket, id){
     const payload = { name: "ping!", id: id };
-    const message = { messageType: "ping", rawMessage: payload}
-    socket.send(JSON.stringify(message));
+    const trisMessage = { messageType: "ping", rawMessage: payload}
+    socket.send(JSON.stringify(trisMessage));
 }
 
 let connectTestButton = document.createElement('button')

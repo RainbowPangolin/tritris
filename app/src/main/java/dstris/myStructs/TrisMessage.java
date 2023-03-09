@@ -1,4 +1,4 @@
-package dstris;
+package dstris.myStructs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
