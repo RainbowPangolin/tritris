@@ -5,6 +5,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import dstris.GameSession.GameSession;
+
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.CloseStatus;
@@ -26,7 +29,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         private List<WebSocketSession> sessions = new ArrayList<>();
         private List<GameSession> rooms = new ArrayList<>();
-        private GameSessionManager roomManager = new GameSessionManager();
+        // private GameSessionManager roomManager = new GameSessionManager();
         private PayloadValidator validator = new PayloadValidator();
         private PayloadHandler handler = new PayloadHandler();
 
@@ -43,17 +46,16 @@ public class WebSocketConfig implements WebSocketConfigurer {
         @Override
         public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
             // Handle incoming messages from the client
-            System.out.println("Received message: " + message.getPayload());
-            
             String payload = message.getPayload();
+
+            System.out.println("Received message: " + payload);
+            
             if (this.validator.isValid(payload)) {
+                // GameSession room = this.roomManager.getSessionAssociatedWith(sessionID);
                 this.handler.handle(session, payload);
             } else {
-                // handle invalid payload
+                System.out.println("ERROR: ILLEGAL PAYLOAD: " + payload);
             }
-
-
-
 
         }
     }
