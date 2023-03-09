@@ -29,6 +29,10 @@ public class PayloadHandler {
     @Autowired
     private GameSessionNegotiationHandler gameSessionNegotiationHandler;
 
+    @Autowired
+    private PingMessageHandler pingMessageHandler;
+
+
     //TODO Make custom object with session and message?
     public PayloadHandler(){
         System.out.println(" --- PayloadHandler instantiated by Spring");
@@ -36,7 +40,7 @@ public class PayloadHandler {
 
     @PostConstruct
     private void initializeMessageHandlers(){
-        messageHandlers.put("ping", new PingMessageHandler());
+        messageHandlers.put("ping", pingMessageHandler);
         messageHandlers.put("roomnegotiation", gameSessionNegotiationHandler);
     }
 

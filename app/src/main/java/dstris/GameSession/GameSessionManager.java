@@ -20,7 +20,6 @@ public class GameSessionManager {
 
     public GameSessionManager(){
         System.out.println(" --- GameSessionManager instantiated by Spring");
-
     }
     
     public void assignClientToRoom(TrisClient client, String roomID){

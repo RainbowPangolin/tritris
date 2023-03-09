@@ -37,7 +37,7 @@ public class GameSessionNegotiationHandler implements CustomMessageHandlerInterf
 
             gameSessionManager.assignClientToRoom(newClient, requestedRoom);
             System.out.println("GameSessionManager has assigned %s to room %s".formatted(player.name, requestedRoom));
-            connection.sendMessage(new TextMessage("Connected player $s, to room %s!".formatted(player.name, player.roomID)));
+            connection.sendMessage(new TextMessage("Connected player %s, to room %s!".formatted(player.name, player.roomID)));
         } catch (Throwable t) {
             // Handle the error or exception
             System.err.println("GameSessionNegotiationHandler: An error occurred at step 2 of message processing: " + t.getMessage());
