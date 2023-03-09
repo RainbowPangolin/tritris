@@ -21,8 +21,10 @@ public class GameSessionNegotiationHandler implements CustomMessageHandlerInterf
         try{
             PlayerInfo player = this.objectMapper.treeToValue(rawMessage, PlayerInfo.class);
 
-            TrisClient
-            gameSessionManager.assignClientToRoom(null, null);
+            TrisClient newClient = new TrisClient(connection, player);
+            String requestedRoom = player.roomID;
+
+            gameSessionManager.assignClientToRoom(newClient, requestedRoom);
 
             connection.sendMessage(new TextMessage("Connected player $s, to room %s!".formatted(player.name, player.roomID)));
         } catch (Throwable t) {
