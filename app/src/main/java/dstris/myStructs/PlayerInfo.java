@@ -6,23 +6,13 @@ public class PlayerInfo {
     public String id;
     public String roomID;
 
-    // public PlayerInfo(){
-    //     this.inMatch = false;
-    //     this.name = "TODO_NAME";
-    //     this.id = "TODO_ID";
-    // }
+    public PlayerInfo(){
+        //default constructor for Jackson usage
+    }
 
-    
-    // public boolean inMatch(){
-    //     return this.inMatch;
-    // }
-
-    // public String getName(){
-    //     return this.name;
-    // }
-
-    // public String getId(){
-    //     return this.id;
-    // }
-
+    public PlayerInfo(String name, String id, String roomID){
+        this.name = name;
+        this.id = id;
+        this.roomID = roomID;
+    }
 }

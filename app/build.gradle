@@ -22,8 +22,16 @@ dependencies {
     //TODO
     // compile 'org.springframework:spring-context:5.3.13'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.webjars:webjars-locator-core'
-
+	// implementation 'org.webjars:webjars-locator-core'
+    // Spring Boot dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.springframework.security:spring-security-test'
     //For JSON processing
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
 

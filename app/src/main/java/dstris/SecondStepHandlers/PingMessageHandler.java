@@ -37,7 +37,7 @@ public class PingMessageHandler implements CustomMessageHandlerInterface {
 
     private void broadcastMessageFromConnection(JsonNode rawMessage, WebSocketSession connection) throws IllegalArgumentException, IOException{
         String connectionID = connection.getId();
-        GameSession curSession = gameSessionManager.getSessionAssociatedWithConnectionId(connectionID);
+        GameSession curSession = gameSessionManager.getGameSessionAssociatedWithConnectionId(connectionID);
         List<WebSocketSession> clientConnectionsToThisRoom = curSession.getConnectedClients();
 
         Ping pingMessage = this.objectMapper.treeToValue(rawMessage, Ping.class);

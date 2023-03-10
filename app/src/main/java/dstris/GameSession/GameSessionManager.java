@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
 import dstris.myStructs.TrisClient;
 
 //A bean. Contains all active rooms at all times.
+//TODO Room and GameSession are kinda used interchangeably, but should be better defined.
 @Component("gameSessionManager")
 @Scope("singleton")
 public class GameSessionManager {
-    private Map<TrisClient, String> clientIdToGameSessionIdMap = new HashMap<>();
-    private Map<String, String> connectionIdToGameSessionIdMap = new HashMap<>();
+    private Map<TrisClient, String> clientIdToRoomIDMap = new HashMap<>();
+    private Map<String, String> connectionIdToRoomIDMap = new HashMap<>();
     private Map<String, GameSession> IdToGameSessionMap = new HashMap<>();
 
     public GameSessionManager(){
@@ -30,8 +31,8 @@ public class GameSessionManager {
     }
 
     private void addClientToGameSession(TrisClient client, String roomID){
-        clientIdToGameSessionIdMap.put(client, roomID);
-        connectionIdToGameSessionIdMap.put(client.getConnectionId(), roomID);
+        clientIdToRoomIDMap.put(client, roomID);
+        connectionIdToRoomIDMap.put(client.getConnectionId(), roomID);
         GameSession curGameSession = getGameSessionById(roomID);
         curGameSession.addPlayer(client);
     }
@@ -45,7 +46,8 @@ public class GameSessionManager {
         IdToGameSessionMap.put(id, gameSession);
     }
 
-    public void deleteGameSession(String id) {
+    //TODO - make public facing method to remove players from session
+    private void deleteGameSession(String id) {
         IdToGameSessionMap.remove(id);
     }
 
@@ -53,19 +55,22 @@ public class GameSessionManager {
         return IdToGameSessionMap.get(id);
     }
 
-    public GameSession getSessionAssociatedWithClient(TrisClient client){
-        String sessionId = clientIdToGameSessionIdMap.get(client);
+    public GameSession getGameSessionAssociatedWithClient(TrisClient client){
+        String roomID = clientIdToRoomIDMap.get(client);
             
-        return getGameSessionById(sessionId);
+        return getGameSessionById(roomID);
     }
 
-    public GameSession getSessionAssociatedWithConnectionId(String connectionId){
-        String sessionId = connectionIdToGameSessionIdMap.get(connectionId);
+    public GameSession getGameSessionAssociatedWithConnectionId(String connectionId){
+        String roomID = connectionIdToRoomIDMap.get(connectionId);
             
-        return getGameSessionById(sessionId);
+        return getGameSessionById(roomID);
     }
 
-    public void addConnectionPendingRoom(){
-
+    public String getRoomIDAssociatedWithClient(TrisClient client){
+        String roomID = clientIdToRoomIDMap.get(client);
+            
+        return roomID;
     }
+
 }
