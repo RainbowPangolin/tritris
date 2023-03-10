@@ -55,6 +55,12 @@ processResources {
     exclude '**/node_modules/**'
 }
 
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()

@@ -1,7 +1,7 @@
 package dstris.SecondStepHandlers;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,6 +11,7 @@ import org.springframework.web.socket.WebSocketSession;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dstris.CustomExceptions.GameSessionNotFoundException;
 import dstris.GameSession.GameSession;
 import dstris.GameSession.GameSessionManager;
 import dstris.myStructs.Ping;
@@ -26,23 +27,39 @@ public class PingMessageHandler implements CustomMessageHandlerInterface {
     @Override
     public void handleMessage(WebSocketSession connection, JsonNode rawMessage) {
         try{
-            broadcastMessageFromConnection(rawMessage, connection);
-        } catch (Throwable t) {
-            // Handle the error or exception
-            System.err.println("PingMessageHandler: An error occurred at step 2 of message processing: " + t.getMessage());
-        }
+            GameSession curSession = getGameSessionForConnection(connection);
+            Ping pingMessage = this.objectMapper.treeToValue(rawMessage, Ping.class);
 
-    
+            updateGameSession(pingMessage, curSession);
+            sendPongToConnectedClients(pingMessage, curSession);
+        } catch (IOException e) {
+            System.err.println("Failed to deserialize Ping message: " + e.getMessage());
+        } catch (GameSessionNotFoundException e) {
+            System.err.println("Failed to find GameSession for connection: " + e.getMessage());
+        } catch (Throwable t) {
+            System.err.println("An error occurred at step 2 of message processing: " + t.getMessage());
+        }
     }
 
-    private void broadcastMessageFromConnection(JsonNode rawMessage, WebSocketSession connection) throws IllegalArgumentException, IOException{
+    private void updateGameSession(Ping pingMessage, GameSession session){
+
+    }
+
+    private GameSession getGameSessionForConnection(WebSocketSession connection) throws GameSessionNotFoundException {
         String connectionID = connection.getId();
         GameSession curSession = gameSessionManager.getGameSessionAssociatedWithConnectionId(connectionID);
-        List<WebSocketSession> clientConnectionsToThisRoom = curSession.getConnectedClients();
-
-        Ping pingMessage = this.objectMapper.treeToValue(rawMessage, Ping.class);
-        for (WebSocketSession curConnection : clientConnectionsToThisRoom){
-            curConnection.sendMessage(new TextMessage("Pong, %s!".formatted(pingMessage.id)));
+        if (curSession == null) {
+            throw new GameSessionNotFoundException("No GameSession found for connection ID: " + connectionID);
+        }
+        return curSession;
+    }
+    
+    private void sendPongToConnectedClients(Ping pingMessage, GameSession curSession) throws IOException {
+        Set<WebSocketSession> clientConnectionsToThisRoom = curSession.getConnectedClients();
+        for (WebSocketSession curConnection : clientConnectionsToThisRoom) {
+            TextMessage textMessage = new TextMessage("Pong, %s!".formatted(pingMessage.id));
+            curConnection.sendMessage(textMessage);
         }
     }
+
 }

@@ -1,0 +1,1 @@
+//send a copy of the new board every time a piece is placed

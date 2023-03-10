@@ -44,16 +44,38 @@ public class GameSessionManagerTest {
   @Test
   public void canAddClientToRoomAndGetRoomID() {
     gameSessionManager.assignClientToRoom(clientA, playerA.roomID);
-    assertEquals(gameSessionManager.getRoomIDAssociatedWithClient(clientA), "TEST_A");
+    assertEquals("TEST_A", gameSessionManager.getRoomIDAssociatedWithClient(clientA));
   }
 
   @Test
   public void canAddMultipleUsersToRoom(){
+    PlayerInfo playerB = new PlayerInfo("playerB", "ID_B", "TEST_A");
+    TrisClient clientB = new TrisClient(session, playerA);
+    PlayerInfo playerC = new PlayerInfo("playerC", "ID_C", "TEST_A");
+    TrisClient clientC = new TrisClient(session, playerA);
+    gameSessionManager.assignClientToRoom(clientA, playerA.roomID);
+    gameSessionManager.assignClientToRoom(clientB, playerB.roomID);
+    gameSessionManager.assignClientToRoom(clientC, playerC.roomID);
 
+    assertEquals("TEST_A", gameSessionManager.getRoomIDAssociatedWithClient(clientA));
+    assertEquals("TEST_A", gameSessionManager.getRoomIDAssociatedWithClient(clientB));
+    assertEquals("TEST_A", gameSessionManager.getRoomIDAssociatedWithClient(clientC));
+
+    int actual = gameSessionManager.getNumberOfPlayersInRoom("TEST_A");
+    assertEquals(3, actual, "Should be 1 player in room, actually there are: %d".formatted(actual));
   }
 
+  //TODO Behavior is still incorrect, improve test.
   @Test
   public void sameUserRepeatedlyRequestsToJoinSameRoom(){
+    gameSessionManager.assignClientToRoom(clientA, playerA.roomID);
+    gameSessionManager.assignClientToRoom(clientA, playerA.roomID);
+    gameSessionManager.assignClientToRoom(clientA, playerA.roomID);
+
+    assertEquals("TEST_A", gameSessionManager.getRoomIDAssociatedWithClient(clientA));
+
+    int actual = gameSessionManager.getNumberOfPlayersInRoom("TEST_A");
+    assertEquals(1, actual, "Should be 1 player in room, actually there are: %d".formatted(actual));
 
   }
 

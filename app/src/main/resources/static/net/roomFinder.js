@@ -5,28 +5,23 @@ let socket
 let ID
 
 function connectToServer(){
-    // Create a WebSocket connection
     socket = new WebSocket(URL);
 
-    // Wait for the connection to be established
     socket.onopen = function(event) {
-    console.log('WebSocket connection established');
-    connectToRoom('ABCD');
+        console.log('WebSocket connection established');
+        connectToRoom('TEST');
     };
 
-    // Handle incoming messages from the server
     socket.onmessage = function(event) {
-    console.log('Received message: ' + event.data);
+        console.log('Received message: ' + event.data);
     };
 
-    // Handle errors
     socket.onerror = function(event) {
-    console.error('WebSocket error: ' + event);
+        console.error('WebSocket error: ' + event);
     };
 
-    // Handle the connection being closed
     socket.onclose = function(event) {
-    console.log('WebSocket connection closed: ' + event.code + ' - ' + event.reason);
+        console.log('WebSocket connection closed: ' + event.code + ' - ' + event.reason);
     };
     
 }
