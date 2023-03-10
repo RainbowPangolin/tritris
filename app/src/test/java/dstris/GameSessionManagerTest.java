@@ -48,12 +48,12 @@ public class GameSessionManagerTest {
   }
 
   @Test
-  public void multipleUsersAddToRoom(){
+  public void canAddMultipleUsersToRoom(){
 
   }
 
   @Test
-  public void repeatedSameUserRequestsToJoinRoom(){
+  public void sameUserRepeatedlyRequestsToJoinSameRoom(){
 
   }
 
