@@ -37,19 +37,16 @@ public class GameSessionManager {
 
     public GameSession getGameSessionAssociatedWithClient(TrisClient client){
         String roomID = clientIDToRoomIDMap.get(client);
-            
         return getGameSessionById(roomID);
     }
 
     public GameSession getGameSessionAssociatedWithConnectionId(String connectionId){
         String roomID = connectionIDToRoomIDMap.get(connectionId);
-            
         return getGameSessionById(roomID);
     }
 
     public String getRoomIDAssociatedWithClient(TrisClient client){
         String roomID = clientIDToRoomIDMap.get(client);
-            
         return roomID;
     }
 

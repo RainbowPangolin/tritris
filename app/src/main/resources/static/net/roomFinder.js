@@ -1,41 +1,16 @@
-const URL = "ws://localhost:8080/game"
-const PROTOCOLS = ["json"]
+import webSocketService from './webSocketService.js';
 
-let socket
-let ID
-
-function connectToServer(){
-    socket = new WebSocket(URL);
-
-    socket.onopen = function(event) {
-        console.log('WebSocket connection established');
-        connectToRoom('TEST');
-    };
-
-    socket.onmessage = function(event) {
-        console.log('Received message: ' + event.data);
-    };
-
-    socket.onerror = function(event) {
-        console.error('WebSocket error: ' + event);
-    };
-
-    socket.onclose = function(event) {
-        console.log('WebSocket connection closed: ' + event.code + ' - ' + event.reason);
-    };
-    
-}
 
 function connectToRoom(roomID){
     const playerInfo = {name: 'playerName', id: 'playerID', roomID: roomID}
     const trisMessage = { messageType: "roomnegotiation", rawMessage: playerInfo}
-    socket.send(JSON.stringify(trisMessage));
+    webSocketService.send(JSON.stringify(trisMessage));
 }
 
-function ping(socket, id){
+function ping(id){
     const payload = { name: "ping!", id: id };
     const trisMessage = { messageType: "ping", rawMessage: payload}
-    socket.send(JSON.stringify(trisMessage));
+    webSocketService.send(JSON.stringify(trisMessage));
 }
 
 let connectTestButton = document.createElement('button')
@@ -43,16 +18,16 @@ let pingATestButton = document.createElement('button')
 let pingBTestButton = document.createElement('button')
 
 connectTestButton.innerHTML = 'CONNECT TO ROOM'
-connectTestButton.addEventListener('click', () => connectToServer())
+connectTestButton.addEventListener('click', () => connectToRoom('TEST'))
 
 pingATestButton.innerHTML = 'PINGA'
 pingATestButton.addEventListener('click', () => {
-    ping(socket, 'A')
+    ping('A')
 })
 
 pingBTestButton.innerHTML = 'PINGB'
 pingBTestButton.addEventListener('click', () => {
-    ping(socket, 'B')
+    ping('B')
 })
 
 document.body.appendChild(connectTestButton)
