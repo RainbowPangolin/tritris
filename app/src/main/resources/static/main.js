@@ -1,4 +1,5 @@
-import {BoardSession} from './boardSession.js'
+import {BoardSession} from './game/boardSession.js'
+import {sendClientStateToServer} from '../net/GameStateSender.js'
 
 let playerBoard = new BoardSession({
     width: 10,
@@ -10,6 +11,17 @@ let playerBoard = new BoardSession({
 playerBoard.addEventListener('onStartGameEvent', () => {
     console.log('game started')
 })
+
+playerBoard.addEventListener('sendClientUpdateToServer', () => {
+    sendClientUpdateToServer();
+})
+
+function sendClientUpdateToServer(){
+    const simplifiedGameStateGrid = playerBoard.gameStateGrid.map(row =>
+        row.map(value => (typeof value === 'object' ? 1 : value))
+      );
+    sendClientStateToServer(playerBoard.player, simplifiedGameStateGrid);
+}
 
 document.addEventListener("keydown", (event) => {
     switch(event.key){

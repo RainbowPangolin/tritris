@@ -36,11 +36,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // Handle incoming messages from the client
         String payload = message.getPayload();
-
-        System.out.println("Received message: " + payload);
-        
         if (this.validator.isValid(payload)) {
-            // GameSession room = this.roomManager.getSessionAssociatedWith(sessionID);
             handler.handle(session, payload);
         } else {
             System.out.println("ERROR: ILLEGAL PAYLOAD/COULD NOT HANDLE: " + payload);

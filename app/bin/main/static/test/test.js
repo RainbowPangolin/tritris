@@ -3,7 +3,6 @@ import jsdom from"jsdom";
 import {CustomEventMock} from "./customEventMock.js"
 import assert from 'node:assert';
 import {Block} from '../game/block.js'
-
 const { JSDOM } = jsdom;
 
 beforeEach(() => {
@@ -13,6 +12,7 @@ beforeEach(() => {
 afterEach(() => {
   delete global.CustomEvent;
 });
+
 
 describe('Debug Bag System', function () {
   const testBag = ['T','L', 'J','S','I','Z','O']

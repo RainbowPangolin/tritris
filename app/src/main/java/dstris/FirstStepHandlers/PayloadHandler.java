@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dstris.SecondStepHandlers.CustomMessageHandlerInterface;
 import dstris.SecondStepHandlers.GameSessionNegotiationHandler;
+import dstris.SecondStepHandlers.GameStateHandler;
 import dstris.SecondStepHandlers.PingMessageHandler;
 import dstris.myStructs.TrisMessage;
 import jakarta.annotation.PostConstruct;
@@ -32,6 +33,9 @@ public class PayloadHandler {
     @Autowired
     private PingMessageHandler pingMessageHandler;
 
+    @Autowired
+    private GameStateHandler gameStateHandler;
+
 
     //TODO Make custom object with session and message?
     public PayloadHandler(){
@@ -42,6 +46,7 @@ public class PayloadHandler {
     private void initializeMessageHandlers(){
         messageHandlers.put("ping", pingMessageHandler);
         messageHandlers.put("roomnegotiation", gameSessionNegotiationHandler);
+        messageHandlers.put("clientgamestate", gameStateHandler);
     }
 
     //TODO session and payload are passed in here to avoid excessive object instantiation. Change?
@@ -49,6 +54,7 @@ public class PayloadHandler {
         try {
             TrisMessage trisMessage = this.objectMapper.readValue(payload, TrisMessage.class);
             CustomMessageHandlerInterface selectedHandler = messageHandlers.get(trisMessage.messageType);
+            System.out.println("Received a %s message.".formatted(trisMessage.messageType));
             if (selectedHandler != null) {
                 selectedHandler.handleMessage(session, trisMessage.rawMessage);
             } else {

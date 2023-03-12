@@ -4,8 +4,7 @@ class WebSocketService {
         this.socket = new WebSocket(url);
 
         this.socket.onopen = function(event) {
-            console.log('WebSocket connection established, ' + event);
-            connectToRoom('TEST');
+            console.log('WebSocket connection established, ' + JSON.stringify(event));
         };
 
         this.socket.onmessage = function(event) {
@@ -13,7 +12,7 @@ class WebSocketService {
         };
 
         this.socket.onerror = function(event) {
-            console.error('WebSocket error: ' + event);
+            console.error('WebSocket error: ' + JSON.stringify(event));
         };
 
         this.socket.onclose = function(event) {

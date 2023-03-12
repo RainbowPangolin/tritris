@@ -20,10 +20,11 @@ export class BoardSession extends EventTarget{
         shadowEnabled = true,
         previewSize = 5,
         pieceQueue = [],
-        spawnPoint = [2, Math.floor(width/2) - 1]
+        spawnPoint = [2, Math.floor(width/2) - 1],
+        player = "DEBUG_PLAYER"
     } = {}){ 
         super()
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint})
+        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, player})
         this.creatFreshGameStateGrid()
         this.initializeGameState()
         this.initializeCanvasDisplay()
@@ -237,9 +238,14 @@ export class BoardSession extends EventTarget{
     }
 
     handlePiecePlacedEvent(){
+        this.handleClientUpdate()
+        const event = new CustomEvent('sendClientUpdateToServer')
+        this.dispatchEvent(event)
+    }
+
+    handleClientUpdate(){
         this.clearFilledLines()
         this.scoreDisplay.innerHTML = this.linesCleared
-
 
         if(this.hasMetFailCondition()){
             console.log('FAIL')
@@ -248,7 +254,6 @@ export class BoardSession extends EventTarget{
         
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
-
     }
 
     hasMetFailCondition(){ 
