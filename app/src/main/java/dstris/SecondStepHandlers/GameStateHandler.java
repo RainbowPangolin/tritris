@@ -15,7 +15,6 @@ import dstris.CustomExceptions.GameSessionNotFoundException;
 import dstris.GameSession.GameSession;
 import dstris.GameSession.GameSessionManager;
 import dstris.myStructs.ClientGameState;
-import dstris.myStructs.Ping;
 
 
 //TODO Switch to static methods and call class directly rather than instantiating?

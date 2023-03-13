@@ -5,12 +5,14 @@
     <title>x</title>
     <style>
       body {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-        grid-gap: 0;
+        display: flex;
+        flex-wrap: wrap;
       }
       canvas {
-        object-fit: contain;
+        flex: 1 1 auto;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
       div > canvas {
         position: absolute;
@@ -38,10 +40,10 @@
   <body>
 
     <!-- <canvas class="backGround" width = 250 height= 550></canvas> -->
-    <script type="module" src="/main.js" >
+    <script type="module" src="./main.js" >
     </script>
 
-  <script type="module" src="/net/roomFinder.js" >
+  <script type="module" src="./net/roomFinder.js" >
   </script>
   </body>
 </html>

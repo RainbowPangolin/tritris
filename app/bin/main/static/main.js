@@ -1,5 +1,5 @@
 import {BoardSession} from './game/boardSession.js'
-import {sendClientStateToServer} from '../net/GameStateSender.js'
+import {sendClientStateToServer} from './net/GameStateSender.js'
 
 let playerBoard = new BoardSession({
     width: 10,
@@ -18,7 +18,7 @@ playerBoard.addEventListener('sendClientUpdateToServer', () => {
 
 function sendClientUpdateToServer(){
     const simplifiedGameStateGrid = playerBoard.gameStateGrid.map(row =>
-        row.map(value => (typeof value === 'object' ? 1 : value))
+        row.map(block => (typeof block === 'object' ? block.color : 'EMPTY'))
       );
     sendClientStateToServer(playerBoard.player, simplifiedGameStateGrid);
 }

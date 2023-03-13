@@ -2,7 +2,7 @@ package dstris.myStructs;
 
 public class ClientGameState {
     public String playerID;
-    public int[][] board;
+    public String[][] board;
 
     public ClientGameState(){
 
