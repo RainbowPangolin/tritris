@@ -16,11 +16,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dstris.GameSession.GameSession;
 import dstris.GameSession.GameSessionManager;
 import dstris.SecondStepHandlers.PingMessageHandler;
+import dstris.myStructs.TrisMessage;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -55,7 +57,14 @@ class PingMessageHandlerTest {
         
         pingMessageHandler.handleMessage(sessionMock, objectMapper.readTree(pingJson));
         
-        verify(sessionMock).sendMessage(new TextMessage("Pong, 123!"));        
+
+        JsonNode payloadMsg = objectMapper.createObjectNode()
+        .put("pong", "Pong, %s!".formatted("123"));
+        TrisMessage trisMessage = new TrisMessage("ping", payloadMsg);
+        String stringifiedMessage = objectMapper.writeValueAsString(trisMessage);
+        TextMessage textMessage = new TextMessage(stringifiedMessage);
+
+        verify(sessionMock).sendMessage(textMessage);        
     }
 
     @Test

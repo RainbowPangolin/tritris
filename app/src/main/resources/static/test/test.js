@@ -1,8 +1,8 @@
-import {BoardSession } from '../game/boardSession.js';
+import {BoardSession} from '../game/ClientPlayer/boardSession.js';
 import jsdom from"jsdom";
 import {CustomEventMock} from "./customEventMock.js"
 import assert from 'node:assert';
-import {Block} from '../game/block.js'
+import {Block} from '../game/ClientPlayer/block.js'
 const { JSDOM } = jsdom;
 
 beforeEach(() => {

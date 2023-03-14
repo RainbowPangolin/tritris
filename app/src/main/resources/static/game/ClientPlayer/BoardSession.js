@@ -300,7 +300,9 @@ export class BoardSession extends EventTarget{
 
     refreshActiveMinoBoard(){
         this.clearActiveDisplay()
-        this.activePiece.draw()
+        if(this.gameOngoing){
+            this.activePiece.draw()
+        }
     }
 
     clearLineAtHeight(depth){
