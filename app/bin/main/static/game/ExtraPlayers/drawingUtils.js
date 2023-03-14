@@ -1,3 +1,6 @@
+import {Block} from '../ClientPlayer/Block.js'
+
+
 export function drawPlacedMinoBoard({canvas, blockGrid} = {}){
     clear(canvas);
     for (let line of blockGrid){

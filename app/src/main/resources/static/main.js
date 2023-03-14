@@ -1,9 +1,10 @@
 import clientPlayer from './game/ClientPlayer/CreateClientPlayer.js'
-// import connectedPlayer from './game/ExtraPlayer/createSecondPlayer.js'
+import connectedPlayer from './game/ExtraPlayers/CreateSecondPlayer.js'
 import {ping} from './net/Pinger.js'
 
 let playerBoard = clientPlayer;
 
+console.log(connectedPlayer)
 
 let pingATestButton = document.createElement('button')
 let pingBTestButton = document.createElement('button')

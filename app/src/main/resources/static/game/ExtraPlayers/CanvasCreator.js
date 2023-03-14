@@ -1,4 +1,4 @@
-class CanvasCreator {
+export class CanvasCreator {
   constructor(domDocument, width, height, blockSize) {
     this.domDocument = domDocument;
     this.width = width;

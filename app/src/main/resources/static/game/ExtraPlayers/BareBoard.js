@@ -4,26 +4,25 @@ const DEFAULT_BLOCK_SIZE = 25;
 
 //Just draws a board and active piece, has no lo
 
-
-
-const canvas = canvasCreator.getNewCanvas({ type: 'minoBoardCanvas' });
-
 export class BareBoard{
-    constructor({blockSize, height, width, domDocument}){
-        this.blockSize = blockSize
+    constructor({blockSize, height, width, domDocument, player}){
+        Object.assign(this, {blockSize, height, width, domDocument, player})
+
+        this.blockSize = blockSize;
         this.canvasCreator = new CanvasCreator(domDocument, width, height, blockSize);
-        this.initializeCanvases()
-        this.createFreshGameStateGrid()
+        this.initializeCanvases();
+        this.createFreshGameStateGrid();
+        this.player = player;
     }
 
     initializeCanvases(){
         this.placedMinoBoardCanvas = this.canvasCreator.getNewCanvas()
         this.activeMinoBoardCanvas = this.canvasCreator.getNewCanvas()
         let mainCanvasDiv = this.domDocument.createElement('div')
-        this.heldPieceCanvas = this.getNewCanvas({type: 'heldPieceCanvas'})
+        this.heldPieceCanvas = this.canvasCreator.getNewCanvas({type: 'heldPieceCanvas'})
 
-        let backgroundCanvas = this.getNewCanvas()
-        backgroundCanvas.style.background = '#eee'
+        let backgroundCanvas = this.canvasCreator.getNewCanvas()
+        backgroundCanvas.style.background = '#eae'
         mainCanvasDiv.append(backgroundCanvas)
     
         mainCanvasDiv.style.width = String(this.width*this.blockSize+'px')
@@ -34,7 +33,6 @@ export class BareBoard{
         this.domDocument.body.append(mainCanvasDiv)
         //Equivalent call for previewCanvases called in getNewPreviewCanvases
     
-        this.debugCanvas.classList.add('debugCanvas')
         this.placedMinoBoardCanvas.classList.add('placedMinoCanvas')
         this.activeMinoBoardCanvas.classList.add('activeMinoCanvas')
         //Equivalent call for previewCanvases called in getNewPreviewCanvases
@@ -76,8 +74,16 @@ export class BareBoard{
         this.gameStateGrid.push(floorArr)
     }
 
+    refreshDisplay(){
+        drawingUtils.drawPlacedMinoBoard({
+            canvas: this.placedMinoBoardCanvas,
+            blockGrid: this.gameStateGrid
+        });
+    }
+
     setGameStateGrid(gameStateGrid){
-        this.gameStateGrid = gameStateGrid
+        this.gameStateGrid = gameStateGrid;
+        this.refreshDisplay();
     }
 
 }
