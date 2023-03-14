@@ -15,6 +15,8 @@ import dstris.CustomExceptions.GameSessionNotFoundException;
 import dstris.GameSession.GameSession;
 import dstris.GameSession.GameSessionManager;
 import dstris.myStructs.Ping;
+import dstris.myStructs.TrisClient;
+import dstris.myStructs.TrisMessage;
 
 
 //TODO Switch to static methods and call class directly rather than instantiating?
@@ -57,7 +59,11 @@ public class PingMessageHandler implements CustomMessageHandlerInterface {
     private void sendPongToConnectedClients(Ping pingMessage, GameSession curSession) throws IOException {
         Set<WebSocketSession> clientConnectionsToThisRoom = curSession.getConnectedClients();
         for (WebSocketSession curConnection : clientConnectionsToThisRoom) {
-            TextMessage textMessage = new TextMessage("Pong, %s!".formatted(pingMessage.id));
+            JsonNode payloadMsg = objectMapper.createObjectNode()
+            .put("pong", "Pong, %s!".formatted(pingMessage.id));
+            TrisMessage trisMessage = new TrisMessage("ping", payloadMsg);
+            String stringifiedMessage = objectMapper.writeValueAsString(trisMessage);
+            TextMessage textMessage = new TextMessage(stringifiedMessage);
             curConnection.sendMessage(textMessage);
         }
     }

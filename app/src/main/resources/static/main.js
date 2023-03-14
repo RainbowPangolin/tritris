@@ -1,27 +1,26 @@
-import {BoardSession} from './game/boardSession.js'
-import {sendClientStateToServer} from './net/GameStateSender.js'
+import clientPlayer from './game/ClientPlayer/CreateClientPlayer.js'
+// import connectedPlayer from './game/ExtraPlayer/createSecondPlayer.js'
+import {ping} from './net/Pinger.js'
 
-let playerBoard = new BoardSession({
-    width: 10,
-    height: 22,
-    domDocument: document,
-    bagSystem: '7-bag'
+let playerBoard = clientPlayer;
+
+
+let pingATestButton = document.createElement('button')
+let pingBTestButton = document.createElement('button')
+
+pingATestButton.innerHTML = 'PINGA'
+pingATestButton.addEventListener('click', () => {
+    ping('A')
 })
 
-playerBoard.addEventListener('onStartGameEvent', () => {
-    console.log('game started')
+pingBTestButton.innerHTML = 'PINGB'
+pingBTestButton.addEventListener('click', () => {
+    ping('B')
 })
 
-playerBoard.addEventListener('sendClientUpdateToServer', () => {
-    sendClientUpdateToServer();
-})
+document.body.appendChild(pingATestButton)
+document.body.appendChild(pingBTestButton)
 
-function sendClientUpdateToServer(){
-    const simplifiedGameStateGrid = playerBoard.gameStateGrid.map(row =>
-        row.map(block => (typeof block === 'object' ? block.color : 'EMPTY'))
-      );
-    sendClientStateToServer(playerBoard.player, simplifiedGameStateGrid);
-}
 
 document.addEventListener("keydown", (event) => {
     switch(event.key){

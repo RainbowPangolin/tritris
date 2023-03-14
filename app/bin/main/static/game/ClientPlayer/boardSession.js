@@ -6,15 +6,7 @@ import {PIECE_ACTIONS, MISC_ACTIONS} from './constants.js'
 
 const DEFAULT_BLOCK_SIZE = 25
 
-function generateRandomPlayerID() {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < 4; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
+
 
 export class BoardSession extends EventTarget{
     gameOngoing
@@ -29,7 +21,7 @@ export class BoardSession extends EventTarget{
         previewSize = 5,
         pieceQueue = [],
         spawnPoint = [2, Math.floor(width/2) - 1],
-        player = generateRandomPlayerID()
+        player
     } = {}){ 
         super()
         Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, player})
@@ -308,9 +300,7 @@ export class BoardSession extends EventTarget{
 
     refreshActiveMinoBoard(){
         this.clearActiveDisplay()
-        if (this.gameOngoing){
-            this.activePiece.draw()
-        }
+        this.activePiece.draw()
     }
 
     clearLineAtHeight(depth){

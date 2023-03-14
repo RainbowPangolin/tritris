@@ -1,20 +1,12 @@
-import {ActivePiece} from './activePiece.js'
+import {ActivePiece} from './ActivePiece.js'
 import {generateNewBagUsing} from './bagSystem.js'
-import {ExtraPieceDrawer} from './extraPieceDrawer.js'
-import {Block} from './block.js'
-import {PIECE_ACTIONS, MISC_ACTIONS} from './constants.js'
+import {ExtraPieceDrawer} from './ExtraPieceDrawer.js'
+import {Block} from './Block.js'
+import {PIECE_ACTIONS, MISC_ACTIONS} from './CONSTANTS.js'
 
 const DEFAULT_BLOCK_SIZE = 25
 
-function generateRandomPlayerID() {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < 4; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
+
 
 export class BoardSession extends EventTarget{
     gameOngoing
@@ -29,11 +21,11 @@ export class BoardSession extends EventTarget{
         previewSize = 5,
         pieceQueue = [],
         spawnPoint = [2, Math.floor(width/2) - 1],
-        player = generateRandomPlayerID()
+        player
     } = {}){ 
         super()
         Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, player})
-        this.creatFreshGameStateGrid()
+        this.createFreshGameStateGrid()
         this.initializeGameState()
         this.initializeCanvasDisplay()
         this.initializeExtraPieceDrawer()
@@ -77,7 +69,7 @@ export class BoardSession extends EventTarget{
         this.extraPieceDrawer.heldBlockSize = this.blockSize
     }
 
-    creatFreshGameStateGrid(){
+    createFreshGameStateGrid(){
         this.gameStateGrid = []
         for (let i = 0; i < this.height; i++){
             let innerGrid = []
@@ -205,7 +197,7 @@ export class BoardSession extends EventTarget{
         this.clearHeldPieceDisplay()
         this.clearActiveDisplay()
         this.clearPlacedDisplay()
-        this.creatFreshGameStateGrid()
+        this.createFreshGameStateGrid()
 
         this.addRequiredBags()
         this.performBoardAction('START')
@@ -308,9 +300,7 @@ export class BoardSession extends EventTarget{
 
     refreshActiveMinoBoard(){
         this.clearActiveDisplay()
-        if (this.gameOngoing){
-            this.activePiece.draw()
-        }
+        this.activePiece.draw()
     }
 
     clearLineAtHeight(depth){

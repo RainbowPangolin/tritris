@@ -10,6 +10,11 @@ public class TrisMessage {
 
     }
 
+    public TrisMessage(String messageType,  JsonNode rawMessage){
+        this.messageType = messageType;
+        this.rawMessage = rawMessage;
+    }
+
     public Object getmessage(){
         return this.rawMessage;
     }

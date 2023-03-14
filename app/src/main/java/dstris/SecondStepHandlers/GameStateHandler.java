@@ -1,6 +1,7 @@
 package dstris.SecondStepHandlers;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import dstris.CustomExceptions.GameSessionNotFoundException;
 import dstris.GameSession.GameSession;
 import dstris.GameSession.GameSessionManager;
 import dstris.myStructs.ClientGameState;
+import dstris.myStructs.TrisMessage;
 
 
 //TODO Switch to static methods and call class directly rather than instantiating?
@@ -31,7 +33,7 @@ public class GameStateHandler implements CustomMessageHandlerInterface {
             ClientGameState clientMessage = this.objectMapper.treeToValue(rawMessage, ClientGameState.class);
 
             updateGameSession(clientMessage, curSession);
-            sendPongToConnectedClients(clientMessage, curSession);
+            sendMessageToConnectedClients(clientMessage, curSession);
         } catch (IOException e) {
             System.err.println("Failed to deserialize ClientGameState message: " + e.getMessage());
         } catch (GameSessionNotFoundException e) {
@@ -54,14 +56,19 @@ public class GameStateHandler implements CustomMessageHandlerInterface {
         return curSession;
     }
     
-    private void sendPongToConnectedClients(ClientGameState clientMessage, GameSession curSession) throws IOException {
+    private void sendMessageToConnectedClients(ClientGameState clientMessage, GameSession curSession) throws IOException {
         Set<WebSocketSession> clientConnectionsToThisRoom = curSession.getConnectedClients();
         for (WebSocketSession curConnection : clientConnectionsToThisRoom) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(clientMessage.board);
-            TextMessage textMessage = new TextMessage(json);
+            //TODO Should include playerID
+            //TODO Move most of this into a helper function
+            byte[] clientBoardBytes = objectMapper.writeValueAsBytes(clientMessage.board);
+            String clientBoard = new String(clientBoardBytes, StandardCharsets.UTF_8);
+            JsonNode payloadMsg = objectMapper.createObjectNode().put("board", clientBoard);
+            TrisMessage trisMessage = new TrisMessage("gamestate", payloadMsg);
+            String stringifiedMessage = objectMapper.writeValueAsString(trisMessage);
+            TextMessage textMessage = new TextMessage(stringifiedMessage);
             curConnection.sendMessage(textMessage);
+            
         }
     }
-
 }

@@ -1,6 +1,6 @@
 //TODO: Attach a ShadowPiece as an Observer?
 
-import { Piece } from "./piece.js";
+import { Piece } from "./Piece.js";
 import {ShadowPiece} from "./shadowPiece.js"
 
 export class ActivePiece extends Piece{

@@ -1,6 +1,15 @@
 // Create a WebSocket service object
+import GameStateMessageHandler from './GameStateMessageHandler.js'
+
+let messageHandlers = new Map()
+function initializeMessageHandlers(){
+    const gameStateHandler = new GameStateMessageHandler();
+    messageHandlers.set("gamestate", gameStateHandler);
+}
+
 class WebSocketService {
     constructor(url) {
+        initializeMessageHandlers();
         this.socket = new WebSocket(url);
 
         this.socket.onopen = function(event) {
@@ -8,7 +17,19 @@ class WebSocketService {
         };
 
         this.socket.onmessage = function(event) {
-            console.log('Received message: ' + event.data);
+            //todo add try catch for messages of no type
+            try {
+                let messageJSON = JSON.parse(event.data);
+                let messageType = messageJSON.messageType;
+                let payload = messageJSON.rawMessage;
+                let handler = messageHandlers.get(messageType);
+                handler.handle(payload)
+                console.log(`Received a ${messageType} message`);
+            } catch (error) {
+                console.log('Received message: ' + event.data);
+                console.log('Not well formulated message: ' + error);
+            }
+
         };
 
         this.socket.onerror = function(event) {

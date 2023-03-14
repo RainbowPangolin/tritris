@@ -1,6 +1,6 @@
-import {Block} from './block.js'
+import {Block} from './Block.js'
 
-import {PIECES, PIECE_COLOR_MAP, KICK_TABLE} from './constants.js'
+import {PIECES, PIECE_COLOR_MAP, KICK_TABLE} from './CONSTANTS.js'
 
 function getDefaultColorOfPiece(shape){
     return PIECE_COLOR_MAP[shape]

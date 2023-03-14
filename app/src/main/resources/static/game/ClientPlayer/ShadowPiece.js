@@ -1,4 +1,4 @@
-import {Piece} from "./piece.js"
+import {Piece} from "./Piece.js"
 
 export class ShadowPiece extends Piece{
     constructor({

@@ -1,4 +1,4 @@
-import {Piece} from './piece.js'
+import {Piece} from './Piece.js'
 const FOUR_GRID = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 // This is a very hacky solution to drawing the previews and holds. I might want to consider redoing the drawing system.
