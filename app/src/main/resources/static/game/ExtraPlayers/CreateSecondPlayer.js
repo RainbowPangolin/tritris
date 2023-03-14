@@ -1,5 +1,8 @@
 import {BareBoard} from './BareBoard.js'
-import {Block} from '../ClientPlayer/Block.js'
+import {Mediator} from '../../mediator/Mediator.js'
+
+
+const mediator = Mediator.getInstance();
 
 const testStrGrid = [
     [
@@ -288,42 +291,9 @@ let secondBoard = new BareBoard({
     player: 'TEST'
 })
 
-// const testGrid = testStrGrid.map((row, y) => {
-//     return row.map(e => {
-//       if (e === 'EMPTY') {
-//         return 0;
-//       } else {
-//         let newBlock = new Block({
-//         canvas: secondBoard.placedMinoBoardCanvas,
-//         grid: secondBoard.gameStateGrid,
-//         blockSize: secondBoard.blockSize,
-//         positionOfCenterBlock: [0,0],
-//         color: e
-//         })
-//         return newBlock;
-//       }
-//     });
-//   });
 
 
-const testGrid = testStrGrid.map((row, y) => {
-return row.map((item, x) => {
-    if (item === 'EMPTY') {
-    return 0
-    } else {
-        let newBlock = new Block({
-        canvas: secondBoard.placedMinoBoardCanvas,
-        grid: secondBoard.gameStateGrid,
-        blockSize: secondBoard.blockSize,
-        positionOfCenterBlock: [y,x],
-        color: item
-        })
-        return newBlock;
-    }
-});
-});
+mediator.subscribe('onReceivedServerGameState', secondBoard, secondBoard.setGameStateGridFromSimple)
 
-
-secondBoard.setGameStateGrid(testGrid);
-
+// secondBoard.setGameStateGridFromSimple(testStrGrid)
 export default secondBoard;

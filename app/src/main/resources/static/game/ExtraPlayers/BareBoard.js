@@ -1,5 +1,7 @@
 import { CanvasCreator } from './CanvasCreator.js';
 import * as drawingUtils from './drawingUtils.js'
+import {Block} from '../ClientPlayer/Block.js'
+
 const DEFAULT_BLOCK_SIZE = 25;
 
 //Just draws a board and active piece, has no lo
@@ -85,6 +87,35 @@ export class BareBoard{
         this.gameStateGrid = gameStateGrid;
         this.refreshDisplay();
     }
+
+    setGameStateGridFromSimple(grid){
+        let fullGameStateGrid = this.getFullGridFromSimple(grid)
+        this.gameStateGrid = fullGameStateGrid;
+        this.refreshDisplay();
+    }
+
+    getFullGridFromSimple(grid){
+        let returnGrid = grid.map((row, y) => {
+            return row.map((item, x) => {
+                if (item === 'EMPTY') {
+                return 0
+                } else {
+                    let newBlock = new Block({
+                    canvas: this.placedMinoBoardCanvas,
+                    grid: this.gameStateGrid,
+                    blockSize: this.blockSize,
+                    positionOfCenterBlock: [y,x],
+                    color: item
+                    })
+                    return newBlock;
+                }
+            });
+        });
+        return returnGrid
+    }
+    
+
+    
 
 }
 
