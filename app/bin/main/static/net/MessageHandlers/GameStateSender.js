@@ -1,4 +1,4 @@
-import webSocketService from './webSocketService.js';
+import webSocketService from '../WebSocketService.js';
 
 export function sendClientStateToServer(id, board){
     const payload = {playerID: id, board: board};

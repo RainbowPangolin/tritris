@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dstris.GameSession.GameSessionManager;
 import dstris.myStructs.PlayerInfo;
 import dstris.myStructs.TrisClient;
+import dstris.myStructs.TrisMessage;
 
 @Component("gameSessionNegotiationHandler")
 @Scope("singleton")
@@ -37,7 +38,16 @@ public class GameSessionNegotiationHandler implements CustomMessageHandlerInterf
 
             gameSessionManager.assignClientToRoom(newClient, requestedRoom);
             System.out.println("GameSessionManager has assigned %s to room %s".formatted(player.name, requestedRoom));
-            connection.sendMessage(new TextMessage("Connected player %s, to room %s!".formatted(player.name, player.roomID)));
+
+            //TODO This is a bit unwieldy- attempt to make smaller
+            String message = "Connected player %s, %s, to room %s!".formatted(player.name, player.id, player.roomID);
+            JsonNode payloadMsg = objectMapper.createObjectNode()
+            .put("message", message)
+            .put("id", player.id);
+            TrisMessage trisMessage = new TrisMessage("clientroomnegotiation", payloadMsg);
+            String stringifiedMessage = objectMapper.writeValueAsString(trisMessage);
+            TextMessage textMessage = new TextMessage(stringifiedMessage);
+            connection.sendMessage(textMessage);
         } catch (Throwable t) {
             // Handle the error or exception
             System.err.println("GameSessionNegotiationHandler: An error occurred at step 2 of message processing: " + t.getMessage());

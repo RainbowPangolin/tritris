@@ -27,6 +27,10 @@ public class TrisClient {
         return this.player;
     }
 
+    public String getPlayerID(){
+        return this.player.id;
+    }
+
     public String getAssignedRoom(){
         return this.assignedRoom;
     }

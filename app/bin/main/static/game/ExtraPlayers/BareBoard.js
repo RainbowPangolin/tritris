@@ -114,7 +114,12 @@ export class BareBoard{
         return returnGrid
     }
     
-
+    setPlayerID(id){
+        this.playerID = id;
+        let clientPlayerIDDisplay = this.domDocument.createElement("p");
+        clientPlayerIDDisplay.innerHTML = this.playerID;
+        this.domDocument.body.append(clientPlayerIDDisplay)
+    }
     
 
 }

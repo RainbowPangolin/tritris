@@ -25,7 +25,8 @@ public class GameSessionManager {
     
     public void assignClientToRoom(TrisClient client, String roomID){
         if (!(roomIDToGameSessionMap.containsKey(roomID))){
-            createGameSession(roomID);        
+            createGameSession(roomID);      
+            System.out.println("New GameSession created with ID: " + roomID);  
         }
         addClientToGameSession(client, roomID);
     }
@@ -56,10 +57,17 @@ public class GameSessionManager {
     }
 
     private void addClientToGameSession(TrisClient client, String roomID){
-        clientIDToRoomIDMap.put(client, roomID);
-        connectionIDToRoomIDMap.put(client.getConnectionId(), roomID);
-        GameSession curGameSession = getGameSessionById(roomID);
-        curGameSession.addPlayer(client);
+        try {
+            clientIDToRoomIDMap.put(client, roomID);
+            connectionIDToRoomIDMap.put(client.getConnectionId(), roomID);
+            GameSession curGameSession = getGameSessionById(roomID);
+            curGameSession.addPlayer(client);
+            System.out.println("Client " + client.getPlayerID() + " added to room " + roomID
+            + " with connectionID: " + client.getConnectionId());  
+        } catch (Throwable t){
+            System.out.println("Error attempting to add client to GameSession: " + t);  
+        }
+
     }
 
     private GameSession getGameSessionById(String roomID){

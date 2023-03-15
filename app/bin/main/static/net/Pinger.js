@@ -1,4 +1,4 @@
-import webSocketService from './webSocketService.js';
+import webSocketService from './WebSocketService.js';
 
 export function ping(id, message){
     const payload = { name: "ping!", id: id, message: message};

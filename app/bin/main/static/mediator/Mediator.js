@@ -11,11 +11,11 @@ export class Mediator {
   
     subscribe(eventType, subscriber, handler) {
         if (!this.subscribers[eventType]) {
-          this.subscribers[eventType] = [];
+            this.subscribers[eventType] = [];
         }
         this.subscribers[eventType].push({
-          subscriber,
-          handler
+            subscriber,
+            handler
         });
       }
     

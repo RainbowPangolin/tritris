@@ -1,10 +1,13 @@
 // Create a WebSocket service object
-import GameStateMessageHandler from './GameStateMessageHandler.js'
+import GameStateMessageHandler from './MessageHandlers/GameStateMessageHandler.js'
+import RoomNegotiationMessageHandler from './MessageHandlers/RoomNegotiationMessageHandler.js'
 
 let messageHandlers = new Map()
 function initializeMessageHandlers(){
     const gameStateHandler = new GameStateMessageHandler();
+    const roomNegotiationMessageHandler = new RoomNegotiationMessageHandler();
     messageHandlers.set("gamestate", gameStateHandler);
+    messageHandlers.set("clientroomnegotiation", roomNegotiationMessageHandler);
 }
 
 class WebSocketService {
@@ -44,6 +47,7 @@ class WebSocketService {
     send(data) {
       this.socket.send(data);
     }
+
   }
   
 const webSocketService = new WebSocketService('ws://localhost:8080/game');

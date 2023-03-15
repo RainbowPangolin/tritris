@@ -1,5 +1,5 @@
 import MessageHandler from './MessageHandlerInterface.js';
-import {Mediator} from '../mediator/Mediator.js'
+import {Mediator} from '../../mediator/Mediator.js'
 
 const mediator = Mediator.getInstance();
 

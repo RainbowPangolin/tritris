@@ -21,10 +21,13 @@ export class BoardSession extends EventTarget{
         previewSize = 5,
         pieceQueue = [],
         spawnPoint = [2, Math.floor(width/2) - 1],
-        player
+        playerID
     } = {}){ 
         super()
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, player})
+        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID})
+        
+        //TODO playerName???
+        this.playerName = "Poop"
         this.createFreshGameStateGrid()
         this.initializeGameState()
         this.initializeCanvasDisplay()
@@ -55,6 +58,10 @@ export class BoardSession extends EventTarget{
         this.scoreDisplay = scoreDisplay
         buttonContainerDiv.append(scoreDisplay)
 
+        let clientPlayerIDDisplay = this.domDocument.createElement("p");
+        clientPlayerIDDisplay.innerHTML = this.playerID;
+        buttonContainerDiv.append(clientPlayerIDDisplay)
+        
         this.domDocument.body.append(buttonContainerDiv)
 
     }
