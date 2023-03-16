@@ -33,7 +33,7 @@ public class GameStateHandler implements CustomMessageHandlerInterface {
             ClientGameState clientMessage = this.objectMapper.treeToValue(rawMessage, ClientGameState.class);
 
             updateGameSession(clientMessage, curSession);
-            sendMessageToConnectedClients(clientMessage, curSession);
+            sendMessageToOtherConnectedClients(clientMessage, curSession);
         } catch (IOException e) {
             System.err.println("Failed to deserialize ClientGameState message: " + e.getMessage());
         } catch (GameSessionNotFoundException e) {
@@ -56,10 +56,11 @@ public class GameStateHandler implements CustomMessageHandlerInterface {
         return curSession;
     }
     
-    private void sendMessageToConnectedClients(ClientGameState clientMessage, GameSession curSession) throws IOException {
-        Set<WebSocketSession> clientConnectionsToThisRoom = curSession.getConnectedClients();
-        for (WebSocketSession curConnection : clientConnectionsToThisRoom) {
-            //TODO Should include playerID
+    private void sendMessageToOtherConnectedClients(ClientGameState clientMessage, GameSession curSession) throws IOException {
+        String hostID = clientMessage.playerID;
+        Set<WebSocketSession> otherClientConnectionsToThisRoom = curSession.getAllConnectionsExceptFrom(hostID);
+
+        for (WebSocketSession curConnection : otherClientConnectionsToThisRoom) {
             //TODO Move most of this into a helper function
             byte[] clientBoardBytes = objectMapper.writeValueAsBytes(clientMessage.board);
             String clientBoard = new String(clientBoardBytes, StandardCharsets.UTF_8);

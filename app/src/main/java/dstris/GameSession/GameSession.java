@@ -49,7 +49,56 @@ public class GameSession {
         return connections;
     }
 
+    public TrisClient getClientWithPlayerID(String id){
+        TrisClient trisClientToReturn = null;
+        for (TrisClient trisClient : this.players) {
+            if (trisClient.getPlayerID().equals(id)) {
+                trisClientToReturn = trisClient;
+                break;
+            }
+        }
+        if (trisClientToReturn != null) {
+            return trisClientToReturn;
+        } else {
+            return null;
+        }
+    }
 
+    public void removeTrisClientById(String id) {
+        TrisClient trisClientToRemove = null;
+        for (TrisClient trisClient : this.players) {
+            if (trisClient.getPlayerID().equals(id)) {
+                trisClientToRemove = trisClient;
+                break;
+            }
+        }
+        if (trisClientToRemove != null) {
+            this.players.remove(trisClientToRemove);
+        }
+    }
+
+    public Set<TrisClient> getAllConnectedClientedExcept(String id){
+        Set<TrisClient> otherConnectedClients = new HashSet<>();
+        for (TrisClient trisClient : this.players) {
+            if (trisClient.getPlayerID().equals(id)) {
+                continue;
+            }
+            otherConnectedClients.add(trisClient);
+        }
+        return otherConnectedClients;
+    } 
+
+    
+    public Set<WebSocketSession> getAllConnectionsExceptFrom(String id){
+        Set<WebSocketSession> otherConnectedClients = new HashSet<>();
+        for (TrisClient trisClient : this.players) {
+            if (trisClient.getPlayerID().equals(id)) {
+                continue;
+            }
+            otherConnectedClients.add(trisClient.getConnection());
+        }
+        return otherConnectedClients;
+    } 
 
 
 }
