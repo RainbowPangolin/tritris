@@ -39,16 +39,20 @@ export class InputHandler{
         const performanceMarkObj = performance.getEntriesByName(key)
         const startTime = performanceMarkObj[0].startTime
         const holdTime = timestamp - startTime;
-
-        if (holdTime >= 1000) {
-            console.log(`Key ${key} held for 1 second or more`);
-        }
+        const elapsedTime = holdTime - this.turboDelay
+        const shouldFire = ((elapsedTime % this.turboInterval) == 0)
 
         const holdReqID = window.requestAnimationFrame((timestamp) => {
             this.handleTurbo(timestamp, key)
         })
 
-        this.keysToHoldRequestID.set(key, holdReqID)
+        //TODO Concerned this has a large memory impact as it fires hundreds of times per second.
+        this.keysToHoldRequestID.set(key, holdReqID)    
+
+        if(holdTime >= this.turboDelay){
+            console.log(`Key ${key} held; DASing`);
+
+        }
 
 
     }
@@ -63,7 +67,7 @@ export class InputHandler{
         if(this.isDASEligible(pressedKey)){
             this.startDAS(pressedKey);
         }
-        console.log("keyDown: ", pressedKey)
+        // console.log("keyDown: ", pressedKey)
         // this.playerBoard.receiveInput(input)
     }
 
