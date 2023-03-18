@@ -29,7 +29,7 @@ export class InputHandler{
         this.lastTime = 0
         this.turboRepeat = null
         this.turboDelay = 200 // default turbo delay in ms
-        this.turboInterval = 20 
+        this.turboInterval = 20
 
         this.keysPressed = new Set()
         this.keysToHoldRequestID = new Map()
@@ -54,8 +54,9 @@ export class InputHandler{
 
 
         if(holdTime >= this.turboDelay && (curTime - lastTime >= this.turboInterval)){
-            console.log(`Key ${key} held; DASing`);
-            this.keysToLastDASTime.set(key, curTime)    
+            this.keysToLastDASTime.set(key, curTime) 
+            const input = this.config.bindings[key]
+            this.playerBoard.receiveInput(input)
         }
 
 
@@ -64,6 +65,10 @@ export class InputHandler{
     handleKeyDown(event) {
         event.preventDefault()
         const pressedKey = event.key
+
+        const input = this.config.bindings[pressedKey]
+        this.playerBoard.receiveInput(input)
+
         if((this.keysPressed.has(pressedKey))){
             return
         }
@@ -71,8 +76,6 @@ export class InputHandler{
         if(this.isDASEligible(pressedKey)){
             this.startDAS(pressedKey);
         }
-        // console.log("keyDown: ", pressedKey)
-        // this.playerBoard.receiveInput(input)
     }
 
     isDASEligible(key){
@@ -105,7 +108,6 @@ export class InputHandler{
 
         this.keysToHoldRequestID.delete(pressedKey)
         performance.clearMarks(pressedKey)
-        console.log("keyUp")
     }
 
     turboInput(input, timestamp) {
