@@ -17,7 +17,7 @@ const defaultConfig = {
         'r': 'RESTART'
     },
     turboDelay: 200, // milliseconds before the first repeat
-    turboInterval: 200 // milliseconds between repeats
+    turboInterval: 20 // milliseconds between repeats
 }
 
 export class InputHandler{
@@ -33,25 +33,29 @@ export class InputHandler{
 
         this.keysPressed = new Set()
         this.keysToHoldRequestID = new Map()
+        this.keysToLastDASTime = new Map()
     }
 
     handleTurbo(timestamp, key){
         const performanceMarkObj = performance.getEntriesByName(key)
         const startTime = performanceMarkObj[0].startTime
         const holdTime = timestamp - startTime;
-        const elapsedTime = holdTime - this.turboDelay
-        const shouldFire = ((elapsedTime % this.turboInterval) == 0)
+
+        let lastTime = this.keysToLastDASTime.get(key)    
+        let curTime = performance.now()
+        // const elapsedTime = holdTime - this.turboDelay
+        // const shouldFire = ((elapsedTime % this.turboInterval) == 0)
 
         const holdReqID = window.requestAnimationFrame((timestamp) => {
             this.handleTurbo(timestamp, key)
         })
 
-        //TODO Concerned this has a large memory impact as it fires hundreds of times per second.
         this.keysToHoldRequestID.set(key, holdReqID)    
 
-        if(holdTime >= this.turboDelay){
-            console.log(`Key ${key} held; DASing`);
 
+        if(holdTime >= this.turboDelay && (curTime - lastTime >= this.turboInterval)){
+            console.log(`Key ${key} held; DASing`);
+            this.keysToLastDASTime.set(key, curTime)    
         }
 
 
@@ -83,6 +87,8 @@ export class InputHandler{
     startDAS(pressedKey){
         this.keysPressed.add(pressedKey)
         performance.mark(pressedKey)
+
+        this.keysToLastDASTime.set(pressedKey, performance.now())    
 
         window.requestAnimationFrame((timestamp) => {
             this.handleTurbo(timestamp, pressedKey)
