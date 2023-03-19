@@ -64,9 +64,7 @@ export class InputHandler{
 
             let mappedAction = this.config.bindings[key]
 
-            if(LR_MOVES.includes(this.moveDirBuffer[0]) && (this.moveDirBuffer[0] != mappedAction)){
-                console.log(this.moveDirBuffer[0], mappedAction)
-
+            if(LR_MOVES.includes(mappedAction) && (this.moveDirBuffer[0] != mappedAction)){
                 return
             }
             
@@ -95,7 +93,9 @@ export class InputHandler{
         //TODO consider refactoring to use mapped action rather than key
         let mappedAction = this.config.bindings[pressedKey]
 
-        this.moveDirBuffer.unshift(mappedAction) 
+        if(LR_MOVES.includes(mappedAction)){
+            this.moveDirBuffer.unshift(mappedAction) 
+        }
 
 
     }
@@ -132,10 +132,8 @@ export class InputHandler{
 
         let mappedAction = this.config.bindings[unPressedKey]
 
-
         this.moveDirBuffer = this.moveDirBuffer.filter(item => item != mappedAction);
 
-        console.log(this.moveDirBuffer)
         let holdReqID = this.keysToHoldRequestID.get(unPressedKey)
         cancelAnimationFrame(holdReqID);
 
