@@ -1,6 +1,7 @@
 // Define a default configuration object
 
-const DAS_ELIGIBLE_MOVES = ['MOVERIGHT', 'MOVELEFT']
+const TURBO_ELIGIBLE_MOVES = ['MOVERIGHT', 'MOVELEFT', 'MOVEDOWN']
+const LR_MOVES = ['MOVERIGHT', 'MOVELEFT']
 
 const defaultConfig = {
     bindings: {
@@ -29,34 +30,52 @@ export class InputHandler{
         this.lastTime = 0
         this.turboRepeat = null
         this.turboDelay = 200 // default turbo delay in ms
-        this.turboInterval = 20
+        this.turboInterval = 200
+        this.softDropInterval = 200
 
         this.keysPressed = new Set()
         this.keysToHoldRequestID = new Map()
         this.keysToLastDASTime = new Map()
+        this.moveDirBuffer = []
     }
 
     handleTurbo(timestamp, key){
-        const performanceMarkObj = performance.getEntriesByName(key)
-        const startTime = performanceMarkObj[0].startTime
-        const holdTime = timestamp - startTime;
+        try {          
+            const performanceMarkObj = performance.getEntriesByName(key)
+            const startTime = performanceMarkObj[0].startTime
+            const holdTime = timestamp - startTime;
+            
+            let lastTime = this.keysToLastDASTime.get(key)    
+            let curTime = performance.now()
 
-        let lastTime = this.keysToLastDASTime.get(key)    
-        let curTime = performance.now()
-        // const elapsedTime = holdTime - this.turboDelay
-        // const shouldFire = ((elapsedTime % this.turboInterval) == 0)
-
-        const holdReqID = window.requestAnimationFrame((timestamp) => {
-            this.handleTurbo(timestamp, key)
-        })
-
-        this.keysToHoldRequestID.set(key, holdReqID)    
-
-
-        if(holdTime >= this.turboDelay && (curTime - lastTime >= this.turboInterval)){
-            this.keysToLastDASTime.set(key, curTime) 
+            const holdReqID = window.requestAnimationFrame((timestamp) => {
+                this.handleTurbo(timestamp, key)
+            })
             const input = this.config.bindings[key]
-            this.playerBoard.receiveInput(input)
+
+            this.keysToHoldRequestID.set(key, holdReqID)    
+
+            let interval
+            if (input == 'MOVEDOWN'){
+                interval = this.softDropInterval
+            } else {
+                interval = this.turboInterval
+            }
+
+            let mappedAction = this.config.bindings[key]
+
+            if(LR_MOVES.includes(this.moveDirBuffer[0]) && (this.moveDirBuffer[0] != mappedAction)){
+                console.log(this.moveDirBuffer[0], mappedAction)
+
+                return
+            }
+            
+            if(holdTime >= this.turboDelay && (curTime - lastTime >= interval)){
+                this.keysToLastDASTime.set(key, curTime) 
+                this.playerBoard.receiveInput(input)
+            }
+        } catch (error){
+            console.log(error, "Caused by key:", key)
         }
 
 
@@ -65,22 +84,33 @@ export class InputHandler{
     handleKeyDown(event) {
         event.preventDefault()
         const pressedKey = event.key
-
-        const input = this.config.bindings[pressedKey]
-        this.playerBoard.receiveInput(input)
-
+        //TODO- prevent simultaneously moving left and right
         if((this.keysPressed.has(pressedKey))){
             return
         }
+  
+        this.keysPressed.add(pressedKey)
+        this.processInput(pressedKey)
+        
+        //TODO consider refactoring to use mapped action rather than key
+        let mappedAction = this.config.bindings[pressedKey]
 
-        if(this.isDASEligible(pressedKey)){
-            this.startDAS(pressedKey);
+        this.moveDirBuffer.unshift(mappedAction) 
+
+
+    }
+
+    processInput(key){
+        const input = this.config.bindings[key]
+        this.playerBoard.receiveInput(input)
+        if(this.isTurboEligible(key)){
+            this.startDAS(key);
         }
     }
 
-    isDASEligible(key){
+    isTurboEligible(key){
         let mappedAction = this.config.bindings[key]
-        if (DAS_ELIGIBLE_MOVES.includes(mappedAction)){
+        if (TURBO_ELIGIBLE_MOVES.includes(mappedAction)){
             return true
         } else {
             return false
@@ -88,11 +118,8 @@ export class InputHandler{
     }
 
     startDAS(pressedKey){
-        this.keysPressed.add(pressedKey)
         performance.mark(pressedKey)
-
         this.keysToLastDASTime.set(pressedKey, performance.now())    
-
         window.requestAnimationFrame((timestamp) => {
             this.handleTurbo(timestamp, pressedKey)
         })
@@ -100,22 +127,21 @@ export class InputHandler{
 
     handleKeyUp(event) {
         event.preventDefault()
-        let pressedKey = event.key
-        this.keysPressed.delete(pressedKey)
+        let unPressedKey = event.key
+        this.keysPressed.delete(unPressedKey)
 
-        let holdReqID = this.keysToHoldRequestID.get(pressedKey)
+        let mappedAction = this.config.bindings[unPressedKey]
+
+
+        this.moveDirBuffer = this.moveDirBuffer.filter(item => item != mappedAction);
+
+        console.log(this.moveDirBuffer)
+        let holdReqID = this.keysToHoldRequestID.get(unPressedKey)
         cancelAnimationFrame(holdReqID);
 
-        this.keysToHoldRequestID.delete(pressedKey)
-        performance.clearMarks(pressedKey)
-    }
+        this.keysToHoldRequestID.delete(unPressedKey)
+        performance.clearMarks(unPressedKey)
 
-    turboInput(input, timestamp) {
-        if (timestamp - this.lastTime >= this.turboInterval) {
-            this.playerBoard.receiveInput(input)
-            this.lastTime = timestamp
-        }
-        this.turboRepeat = requestAnimationFrame(turboInput.bind(null, input))
     }
 
     bindHandlerToDocument(domDocument){
