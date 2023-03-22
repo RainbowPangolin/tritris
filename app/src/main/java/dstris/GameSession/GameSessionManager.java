@@ -1,7 +1,9 @@
 package dstris.GameSession;
 
+import java.util.ArrayList;
 // import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 // import java.util.List;
 import java.util.Map;
 
@@ -15,9 +17,11 @@ import dstris.myStructs.TrisClient;
 @Component("gameSessionManager")
 @Scope("singleton")
 public class GameSessionManager {
-    private Map<TrisClient, String> clientIDToRoomIDMap = new HashMap<>();
+    private Map<TrisClient, String> clientToRoomIDMap = new HashMap<>();
+    private Map<String, TrisClient> clientToConnectionIDMap = new HashMap<>();
     private Map<String, String> connectionIDToRoomIDMap = new HashMap<>();
     private Map<String, GameSession> roomIDToGameSessionMap = new HashMap<>();
+
 
     public GameSessionManager(){
         System.out.println(" --- GameSessionManager instantiated by Spring");
@@ -37,7 +41,7 @@ public class GameSessionManager {
     }
 
     public GameSession getGameSessionAssociatedWithClient(TrisClient client){
-        String roomID = clientIDToRoomIDMap.get(client);
+        String roomID = clientToRoomIDMap.get(client);
         return getGameSessionById(roomID);
     }
 
@@ -47,7 +51,7 @@ public class GameSessionManager {
     }
 
     public String getRoomIDAssociatedWithClient(TrisClient client){
-        String roomID = clientIDToRoomIDMap.get(client);
+        String roomID = clientToRoomIDMap.get(client);
         return roomID;
     }
 
@@ -56,9 +60,15 @@ public class GameSessionManager {
         return room.getNumberOfPlayers();
     }
 
+    public void removePlayerWithConnectionID(String connectionID){
+        TrisClient client = clientToConnectionIDMap.get(connectionID);
+        removePlayerFromGameSession(client);
+    }
+
     private void addClientToGameSession(TrisClient client, String roomID){
         try {
-            clientIDToRoomIDMap.put(client, roomID);
+            clientToConnectionIDMap.put(client.getConnectionId(), client);
+            clientToRoomIDMap.put(client, roomID);
             connectionIDToRoomIDMap.put(client.getConnectionId(), roomID);
             GameSession curGameSession = getGameSessionById(roomID);
             curGameSession.addPlayer(client);
@@ -82,6 +92,17 @@ public class GameSessionManager {
     //TODO - make public facing method to remove players from session
     private void deleteGameSession(String id) {
         roomIDToGameSessionMap.remove(id);
+    }
+
+
+
+    private void removePlayerFromGameSession(TrisClient client){
+        String roomID = getRoomIDAssociatedWithClient(client);
+        System.out.println("Removing " + client.getPlayerID() + " from room " + roomID + "!");
+        GameSession curGameSession = getGameSessionById(roomID);
+        curGameSession.removePlayer(client);
+        clientToRoomIDMap.remove(client);
+        connectionIDToRoomIDMap.remove(client.getConnectionId());
     }
 
 

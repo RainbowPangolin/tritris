@@ -1,4 +1,4 @@
-package dstris;
+package dstris.WebSocketService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,10 @@ import dstris.FirstStepHandlers.PayloadValidator;
 @Component
 public class WebSocketHandler extends TextWebSocketHandler {
 
-    private List<WebSocketSession> sessions = new ArrayList<>();
     private PayloadValidator validator = new PayloadValidator();
+
+    @Autowired
+    private WebSocketConnectionCloseHandler connectionCloseHandler = new WebSocketConnectionCloseHandler();
 
     @Autowired
     private PayloadHandler handler; // = new PayloadHandler();
@@ -25,13 +27,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Established connection to: " + session.getId());
-        sessions.add(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         System.out.println("Cut connection with: " + session.getId());
-        sessions.remove(session);
+        connectionCloseHandler.handleConnectionClose(session, status);
     }
 
     @Override

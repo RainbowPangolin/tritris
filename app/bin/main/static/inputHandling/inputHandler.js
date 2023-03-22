@@ -29,9 +29,9 @@ export class InputHandler{
         this.config = JSON.parse(localStorage.getItem('config')) || defaultConfig
         this.lastTime = 0
         this.turboRepeat = null
-        this.turboDelay = 200 // default turbo delay in ms
-        this.turboInterval = 200
-        this.softDropInterval = 200
+        this.turboDelay = 170 // default turbo delay in ms
+        this.turboInterval = 20
+        this.softDropInterval = 20
 
         this.keysPressed = new Set()
         this.keysToHoldRequestID = new Map()
@@ -79,7 +79,15 @@ export class InputHandler{
 
     }
 
+    
+
     handleKeyDown(event) {
+
+        let isInputElement = event.target.tagName.toLowerCase() == 'input' || event.target.closest('input') != null;
+        if (isInputElement) {
+            return
+        }
+
         event.preventDefault()
         const pressedKey = event.key
         //TODO- prevent simultaneously moving left and right

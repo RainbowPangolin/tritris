@@ -21,10 +21,11 @@ export class BoardSession extends EventTarget{
         previewSize = 5,
         pieceQueue = [],
         spawnPoint = [2, Math.floor(width/2) - 1],
-        playerID
+        playerID,
+        roomID = 'TEST'
     } = {}){ 
         super()
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID})
+        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID, roomID})
         
         //TODO playerName???
         this.playerName = "Poop"
@@ -466,4 +467,11 @@ export class BoardSession extends EventTarget{
         return this.activePiece.shadowPiece
     }
 
+    getRoomID(){
+        return this.roomID
+    }
+
+    setRoomID(roomID){
+        this.roomID = roomID
+    }
 }

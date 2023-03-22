@@ -43,13 +43,17 @@ function connectToRoom(name, id, roomID){
 }
 
 let connectTestButton = document.createElement('button')
-
 connectTestButton.innerHTML = 'CONNECT TO ROOM'
-connectTestButton.addEventListener('click', () => connectToRoom(playerBoard.playerName, playerBoard.playerID, 'TEST'))
-
+connectTestButton.addEventListener('click', () => connectToRoom(playerBoard.playerName, playerBoard.playerID,  playerBoard.roomID))
 document.body.appendChild(connectTestButton)
 
-
+let roomIDManualInput = document.createElement('input')
+roomIDManualInput.type = 'text'
+roomIDManualInput.innerHTML = 'ROOMID'
+roomIDManualInput.addEventListener('click', () => {
+    playerBoard.setRoomID(roomIDManualInput.innerHTML)
+})
+document.body.appendChild(roomIDManualInput)
 
 
 export default playerBoard;

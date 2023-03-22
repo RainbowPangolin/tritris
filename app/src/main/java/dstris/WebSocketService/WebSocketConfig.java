@@ -1,4 +1,4 @@
-package dstris;
+package dstris.WebSocketService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
