@@ -52,7 +52,7 @@ class WebSocketService {
 
 const localURL = 'ws://localhost:8080/game'
 
-const webURL = 'ws://dangle-fourwide.azuremicroservices.io/game'
+const webURL = 'wss://dangle-fourwide.azuremicroservices.io/game'
 
 const webSocketService = new WebSocketService(webURL);
 export default webSocketService;
