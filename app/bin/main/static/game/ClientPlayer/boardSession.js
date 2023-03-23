@@ -66,6 +66,18 @@ export class BoardSession extends EventTarget{
         this.domDocument.body.append(buttonContainerDiv)
 
         this.buttonContainerDiv = buttonContainerDiv
+
+        let connectedPlayersList = this.domDocument.createElement("ul");
+        let connectedPlayersDisplayDescription = this.domDocument.createElement("p");
+        let connectedPlayersDisplayDiv = this.domDocument.createElement("div");
+        // connectedPlayersDisplayDescription.innerHTML = `Players in room:`;
+        connectedPlayersDisplayDiv.append(connectedPlayersDisplayDescription)
+        connectedPlayersDisplayDiv.append(connectedPlayersList)
+        this.connectedPlayersListDomElement = connectedPlayersList
+
+        this.buttonContainerDiv.append(connectedPlayersDisplayDiv)
+
+
     }
 
     addElementToHUD(element){
@@ -120,6 +132,7 @@ export class BoardSession extends EventTarget{
         mainCanvasDiv.append(backgroundCanvas)
 
         mainCanvasDiv.style.width = String(this.width*this.blockSize+'px')
+        mainCanvasDiv.style.height = String(this.height*this.blockSize+'px')
         mainCanvasDiv.append(this.placedMinoBoardCanvas) 
         mainCanvasDiv.append(this.debugCanvas)
         mainCanvasDiv.append(this.activeMinoBoardCanvas)
@@ -478,5 +491,13 @@ export class BoardSession extends EventTarget{
 
     setRoomID(roomID){
         this.roomID = roomID
+    }
+
+    addPlayerToListInRoom(playerID){
+        let connectedPlayersItem = this.domDocument.createElement("li");
+        connectedPlayersItem.innerHTML = playerID
+        this.connectedPlayersListDomElement.append(connectedPlayersItem)
+
+        console.log('asdf!', playerID)
     }
 }

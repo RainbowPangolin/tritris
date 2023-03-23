@@ -5,7 +5,9 @@ const mediator = Mediator.getInstance();
 
 export default class RoomNegotiationMessageHandler extends MessageHandler {
   handle(payload) {
-    mediator.publish('onSecondPlayerConnected', payload.id)
+    // mediator.publish('onSecondPlayerConnected', payload.id)
+
+    mediator.publish('onNewPlayerConnected', payload.id)
     console.log("RoomNegotiationMessageHandler: ", payload.message);
     // do something 
   }

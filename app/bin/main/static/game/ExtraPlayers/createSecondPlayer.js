@@ -292,7 +292,7 @@ let secondBoard = new BareBoard({
 })
 
 mediator.subscribe('onReceivedServerGameState', secondBoard, secondBoard.setGameStateGridFromSimple)
-mediator.subscribe('onSecondPlayerConnected', secondBoard, secondBoard.setPlayerID)
+// mediator.subscribe('onSecondPlayerConnected', secondBoard, secondBoard.setPlayerID)
 
 
 export default secondBoard;

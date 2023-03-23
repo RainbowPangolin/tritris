@@ -1,6 +1,8 @@
 import webSocketService from '../../net/WebSocketService.js';
 import {BoardSession} from './BoardSession.js'
 import {sendClientStateToServer} from '../../net/MessageHandlers/GameStateSender.js'
+import {Mediator} from '../../mediator/Mediator.js'
+const mediator = Mediator.getInstance();
 
 
 function generateRandomPlayerID() {
@@ -23,6 +25,20 @@ let playerBoard = new BoardSession({
 
 playerBoard.addEventListener('onStartGameEvent', () => {
     console.log('game started')
+
+    try{
+        let endNotif = document.querySelector('body > text')
+        endNotif.remove()
+    } catch (e){
+        //do nothing
+    }
+
+})
+
+playerBoard.addEventListener('onEndGameEvent', () => {
+    let endNotification = document.createElement('text')
+    endNotification.innerHTML = 'Game over! Restart to keep playing.'
+    document.body.append(endNotification)
 })
 
 playerBoard.addEventListener('sendClientUpdateToServer', () => {
@@ -64,6 +80,9 @@ roomInputDesc.innerHTML = 'ROOMID:'
 playerBoard.addElementToHUD(roomInputDesc)
 playerBoard.addElementToHUD(roomIDManualInput)
 playerBoard.addElementToHUD(connectTestButton)
+
+//TODO - Server needs to submit list of players in room
+// mediator.subscribe('onNewPlayerConnected', playerBoard, playerBoard.addPlayerToListInRoom)
 
 
 

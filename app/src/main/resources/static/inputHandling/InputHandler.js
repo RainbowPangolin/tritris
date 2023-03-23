@@ -82,13 +82,14 @@ export class InputHandler{
     
 
     handleKeyDown(event) {
-        const pressedKey = event.key
+        const keyCode = event.keyCode || event.which;
+        const pressedKey = String.fromCharCode(keyCode).toLowerCase();
         let isInputElement = event.target.tagName.toLowerCase() == 'input' || event.target.closest('input') != null;
        
         if (isInputElement) {
             return
         }
-        if(this.config.bindings.includes(pressedKey)){
+        if(!(pressedKey in this.config.bindings)){
             return
         }
 
