@@ -82,14 +82,17 @@ export class InputHandler{
     
 
     handleKeyDown(event) {
-
+        const pressedKey = event.key
         let isInputElement = event.target.tagName.toLowerCase() == 'input' || event.target.closest('input') != null;
+       
         if (isInputElement) {
+            return
+        }
+        if(this.config.bindings.includes(pressedKey)){
             return
         }
 
         event.preventDefault()
-        const pressedKey = event.key
         //TODO- prevent simultaneously moving left and right
         if((this.keysPressed.has(pressedKey))){
             return

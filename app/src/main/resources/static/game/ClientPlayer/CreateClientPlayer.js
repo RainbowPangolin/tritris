@@ -45,7 +45,7 @@ function connectToRoom(name, id, roomID){
 let connectTestButton = document.createElement('button')
 connectTestButton.innerHTML = 'CONNECT TO ROOM'
 connectTestButton.addEventListener('click', () => connectToRoom(playerBoard.playerName, playerBoard.playerID,  playerBoard.roomID))
-document.body.appendChild(connectTestButton)
+connectTestButton.disabled = true
 
 let roomIDManualInput = document.createElement('input')
 roomIDManualInput.type = 'text'
@@ -53,7 +53,18 @@ roomIDManualInput.innerHTML = 'ROOMID'
 roomIDManualInput.addEventListener('click', () => {
     playerBoard.setRoomID(roomIDManualInput.innerHTML)
 })
-document.body.appendChild(roomIDManualInput)
+roomIDManualInput.addEventListener('input', function() {
+    const value = roomIDManualInput.value.trim();
+    const isFourLetters = /^[a-zA-Z]{4}$/.test(value);
+    connectTestButton.disabled = !isFourLetters;
+});
+
+let roomInputDesc = document.createElement('p')
+roomInputDesc.innerHTML = 'ROOMID:'
+playerBoard.addElementToHUD(roomInputDesc)
+playerBoard.addElementToHUD(roomIDManualInput)
+playerBoard.addElementToHUD(connectTestButton)
+
 
 
 export default playerBoard;

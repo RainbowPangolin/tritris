@@ -48,8 +48,12 @@ class WebSocketService {
       this.socket.send(data);
     }
 
-  }
-  
-const webSocketService = new WebSocketService('ws://localhost:8080/game');
+}
+
+const localURL = 'ws://localhost:8080/game'
+
+const webURL = 'ws://dangle-fourwide.azuremicroservices.io/game'
+
+const webSocketService = new WebSocketService(webURL);
 export default webSocketService;
   
