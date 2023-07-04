@@ -15,6 +15,7 @@ export class BoardSession extends EventTarget{
         width = 10, 
         height = 22, 
         domDocument = null,  
+        containerDiv = null,  
         bagSystem = '7-bag',
         gravity = 1,
         shadowEnabled = true,
@@ -25,16 +26,22 @@ export class BoardSession extends EventTarget{
         roomID = 'TEST'
     } = {}){ 
         super()
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID, roomID})
+        Object.assign(this, {width, height, domDocument, containerDiv, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID, roomID})
         
         //TODO playerName???
         this.playerName = "NONE"
+        this.initializeContainerDiv()
         this.createFreshGameStateGrid()
         this.initializeGameState()
         this.initializeCanvasDisplay()
         this.initializeExtraPieceDrawer()
         this.initializeHUD()
         this.addRequiredBags()
+    }
+
+    initializeContainerDiv(){
+        let containerDiv = this.domDocument.createElement("div");
+        this.containerDiv = containerDiv;
     }
 
     //TODO Maybe break this up into a new class

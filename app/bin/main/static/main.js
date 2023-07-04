@@ -1,28 +1,15 @@
 import clientPlayer from './game/ClientPlayer/CreateClientPlayer.js'
 import connectedPlayer from './game/ExtraPlayers/CreateSecondPlayer.js'
 import {InputHandler} from './inputHandling/InputHandler.js'
-import {ping} from './net/Pinger.js'
 
-let playerBoard = clientPlayer;
+document.getElementById("startsingleplayer").addEventListener("click", function() {
+    // Code to execute when the button is clicked
+    console.log("Button clicked!");
 
-console.log(connectedPlayer)
+    let playerBoard = clientPlayer;
 
-// let pingATestButton = document.createElement('button')
-// let pingBTestButton = document.createElement('button')
+    let clientInputHandler = new InputHandler(playerBoard);
+    clientInputHandler.bindHandlerToDocument(document);
 
-// pingATestButton.innerHTML = 'PINGA'
-// pingATestButton.addEventListener('click', () => {
-//     ping('A')
-// })
-
-// pingBTestButton.innerHTML = 'PINGB'
-// pingBTestButton.addEventListener('click', () => {
-//     ping('B')
-// })
-
-// document.body.appendChild(pingATestButton)
-// document.body.appendChild(pingBTestButton)
-
-
-let clientInputHandler = new InputHandler(playerBoard);
-clientInputHandler.bindHandlerToDocument(document);
+    playerBoard.show();
+});
