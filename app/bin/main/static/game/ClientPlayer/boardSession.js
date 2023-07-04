@@ -42,8 +42,8 @@ export class BoardSession extends EventTarget{
     initializeContainerDiv(){
         let containerDiv = this.domDocument.createElement("div");
         this.containerDiv = containerDiv;
-        containerDiv.classList.add("myClass");
-
+        containerDiv.id ="clientplayer";
+        this.containerDiv.classList.add('hidden');
 
         this.domDocument.body.append(containerDiv);
 
@@ -74,8 +74,10 @@ export class BoardSession extends EventTarget{
         let clientPlayerIDDisplay = this.domDocument.createElement("p");
         clientPlayerIDDisplay.innerHTML = `Player ID: ${this.playerID}`;
         buttonContainerDiv.append(clientPlayerIDDisplay)
-        
-        this.domDocument.body.append(buttonContainerDiv)
+
+        buttonContainerDiv.id = "buttonContainer"; // Set the id attribute value
+
+        this.containerDiv.append(buttonContainerDiv)
 
         this.buttonContainerDiv = buttonContainerDiv
 
@@ -149,7 +151,7 @@ export class BoardSession extends EventTarget{
         mainCanvasDiv.append(this.debugCanvas)
         mainCanvasDiv.append(this.activeMinoBoardCanvas)
 
-        this.domDocument.body.append(mainCanvasDiv)
+        this.containerDiv.append(mainCanvasDiv)
         //Equivalent call for previewCanvases called in getNewPreviewCanvases
 
         this.debugCanvas.classList.add('debugCanvas')
@@ -191,7 +193,7 @@ export class BoardSession extends EventTarget{
             newPreviewCanvas.classList.add('previewCanvas')
         }
 
-        this.domDocument.body.append(previewCanvasDiv)
+        this.containerDiv.append(previewCanvasDiv)
         this.previewCanvasDiv = previewCanvasDiv
         return listOfPreviewCanvases
     }
@@ -512,4 +514,14 @@ export class BoardSession extends EventTarget{
 
         console.log('asdf!', playerID)
     }
+
+    show(){
+        this.containerDiv.classList.remove('hidden');
+    }
+
+    hide(){
+        this.containerDiv.classList.add('hidden');
+    }
+    
+    
 }

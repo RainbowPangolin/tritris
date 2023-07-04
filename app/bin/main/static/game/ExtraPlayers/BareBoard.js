@@ -7,14 +7,25 @@ const DEFAULT_BLOCK_SIZE = 25;
 //Just draws a board and active piece, has no lo
 
 export class BareBoard{
-    constructor({blockSize, height, width, domDocument, player}){
-        Object.assign(this, {blockSize, height, width, domDocument, player})
+    constructor({blockSize, height, width, domDocument, containerDiv, player}){
+        Object.assign(this, {blockSize, height, width, domDocument, containerDiv, player})
 
         this.blockSize = blockSize;
         this.canvasCreator = new CanvasCreator(domDocument, width, height, blockSize);
+        this.initializeContainerDiv();
         this.initializeCanvases();
         this.createFreshGameStateGrid();
         this.player = player;
+    }
+
+    initializeContainerDiv(){
+        let containerDiv = this.domDocument.createElement("div");
+        this.containerDiv = containerDiv;
+        containerDiv.id ="onlineplayer";
+        this.containerDiv.classList.add('hidden');
+
+        this.domDocument.body.append(containerDiv);
+
     }
 
     initializeCanvases(){
@@ -32,7 +43,7 @@ export class BareBoard{
         mainCanvasDiv.append(this.debugCanvas)
         mainCanvasDiv.append(this.activeMinoBoardCanvas)
     
-        this.domDocument.body.append(mainCanvasDiv)
+        this.containerDiv.append(mainCanvasDiv)
         //Equivalent call for previewCanvases called in getNewPreviewCanvases
     
         this.placedMinoBoardCanvas.classList.add('placedMinoCanvas')
@@ -55,7 +66,7 @@ export class BareBoard{
             newPreviewCanvas.classList.add('previewCanvas')
         }
 
-        this.domDocument.body.append(previewCanvasDiv)
+        this.containerDiv.append(previewCanvasDiv)
         this.previewCanvasDiv = previewCanvasDiv
         return listOfPreviewCanvases
     }
@@ -118,8 +129,17 @@ export class BareBoard{
         this.playerID = id;
         let clientPlayerIDDisplay = this.domDocument.createElement("p");
         clientPlayerIDDisplay.innerHTML = this.playerID;
-        this.domDocument.body.append(clientPlayerIDDisplay)
+        this.containerDiv.append(clientPlayerIDDisplay)
     }
+
+    show(){
+        this.containerDiv.classList.remove('hidden');
+    }
+
+    hide(){
+        this.containerDiv.classList.add('hidden');
+    }
+    
     
 
 }
