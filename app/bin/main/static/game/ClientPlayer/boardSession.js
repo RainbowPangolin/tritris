@@ -42,6 +42,11 @@ export class BoardSession extends EventTarget{
     initializeContainerDiv(){
         let containerDiv = this.domDocument.createElement("div");
         this.containerDiv = containerDiv;
+        containerDiv.classList.add("myClass");
+
+
+        this.domDocument.body.append(containerDiv);
+
     }
 
     //TODO Maybe break this up into a new class
