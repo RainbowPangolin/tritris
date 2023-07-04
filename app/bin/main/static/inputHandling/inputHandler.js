@@ -1,4 +1,5 @@
 // Define a default configuration object
+//TODO Grab settings from local storage
 
 const TURBO_ELIGIBLE_MOVES = ['MOVERIGHT', 'MOVELEFT', 'MOVEDOWN']
 const LR_MOVES = ['MOVERIGHT', 'MOVELEFT']
