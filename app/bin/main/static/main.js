@@ -13,7 +13,8 @@ document.getElementById("startsingleplayer").addEventListener("click", function(
 
     playerBoard.show();
     connectedPlayer.hide();
-
+    hideStartScreen();
+    hideMultiplayer();
 });
 
 
@@ -28,6 +29,9 @@ document.getElementById("startmultiplayer").addEventListener("click", function()
 
     playerBoard.show();
     connectedPlayer.show();
+
+    hideStartScreen();
+    hideSingleplayer();
 });
 
 function hideStartScreen(){
@@ -39,5 +43,5 @@ function hideMultiplayer(){
 }
 
 function hideSingleplayer(){
-    
+
 }
