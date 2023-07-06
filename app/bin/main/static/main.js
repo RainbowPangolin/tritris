@@ -29,3 +29,15 @@ document.getElementById("startmultiplayer").addEventListener("click", function()
     playerBoard.show();
     connectedPlayer.show();
 });
+
+function hideStartScreen(){
+
+}
+
+function hideMultiplayer(){
+
+}
+
+function hideSingleplayer(){
+    
+}
