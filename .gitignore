@@ -7,3 +7,5 @@ build
 .vscode
 app/bin
 app/build
+
+node_modules
