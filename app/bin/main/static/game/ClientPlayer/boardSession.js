@@ -74,7 +74,7 @@ export class BoardSession extends EventTarget{
         let clientPlayerIDDisplay = this.domDocument.createElement("p");
         clientPlayerIDDisplay.innerHTML = `Player ID: ${this.playerID}`;
         buttonContainerDiv.append(clientPlayerIDDisplay)
-
+        
         buttonContainerDiv.id = "buttonContainer"; // Set the id attribute value
 
         this.containerDiv.append(buttonContainerDiv)

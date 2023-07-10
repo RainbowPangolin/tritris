@@ -58,6 +58,10 @@ function connectToRoom(name, id, roomID){
     webSocketService.send(JSON.stringify(trisMessage));
 }
 
+function show(){
+    playerBoard.show();
+}
+
 let connectTestButton = document.createElement('button')
 connectTestButton.innerHTML = 'CONNECT TO ROOM'
 connectTestButton.addEventListener('click', () => connectToRoom(playerBoard.playerName, playerBoard.playerID,  playerBoard.roomID))

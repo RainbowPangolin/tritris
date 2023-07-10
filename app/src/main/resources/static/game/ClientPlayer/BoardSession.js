@@ -15,6 +15,7 @@ export class BoardSession extends EventTarget{
         width = 10, 
         height = 22, 
         domDocument = null,  
+        containerDiv = null,  
         bagSystem = '7-bag',
         gravity = 1,
         shadowEnabled = true,
@@ -25,16 +26,27 @@ export class BoardSession extends EventTarget{
         roomID = 'TEST'
     } = {}){ 
         super()
-        Object.assign(this, {width, height, domDocument, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID, roomID})
+        Object.assign(this, {width, height, domDocument, containerDiv, bagSystem, gravity, shadowEnabled, previewSize, pieceQueue, spawnPoint, playerID, roomID})
         
         //TODO playerName???
         this.playerName = "NONE"
+        this.initializeContainerDiv()
         this.createFreshGameStateGrid()
         this.initializeGameState()
         this.initializeCanvasDisplay()
         this.initializeExtraPieceDrawer()
         this.initializeHUD()
         this.addRequiredBags()
+    }
+
+    initializeContainerDiv(){
+        let containerDiv = this.domDocument.createElement("div");
+        this.containerDiv = containerDiv;
+        containerDiv.id ="clientplayer";
+        this.containerDiv.classList.add('hidden');
+
+        this.domDocument.body.append(containerDiv);
+
     }
 
     //TODO Maybe break this up into a new class
@@ -63,7 +75,9 @@ export class BoardSession extends EventTarget{
         clientPlayerIDDisplay.innerHTML = `Player ID: ${this.playerID}`;
         buttonContainerDiv.append(clientPlayerIDDisplay)
         
-        this.domDocument.body.append(buttonContainerDiv)
+        buttonContainerDiv.id = "buttonContainer"; // Set the id attribute value
+
+        this.containerDiv.append(buttonContainerDiv)
 
         this.buttonContainerDiv = buttonContainerDiv
 
@@ -137,7 +151,7 @@ export class BoardSession extends EventTarget{
         mainCanvasDiv.append(this.debugCanvas)
         mainCanvasDiv.append(this.activeMinoBoardCanvas)
 
-        this.domDocument.body.append(mainCanvasDiv)
+        this.containerDiv.append(mainCanvasDiv)
         //Equivalent call for previewCanvases called in getNewPreviewCanvases
 
         this.debugCanvas.classList.add('debugCanvas')
@@ -179,7 +193,7 @@ export class BoardSession extends EventTarget{
             newPreviewCanvas.classList.add('previewCanvas')
         }
 
-        this.domDocument.body.append(previewCanvasDiv)
+        this.containerDiv.append(previewCanvasDiv)
         this.previewCanvasDiv = previewCanvasDiv
         return listOfPreviewCanvases
     }
@@ -500,4 +514,14 @@ export class BoardSession extends EventTarget{
 
         console.log('asdf!', playerID)
     }
+
+    show(){
+        this.containerDiv.classList.remove('hidden');
+    }
+
+    hide(){
+        this.containerDiv.classList.add('hidden');
+    }
+    
+    
 }

@@ -3,7 +3,7 @@ import connectedPlayer from './game/ExtraPlayers/CreateSecondPlayer.js'
 import {InputHandler} from './inputHandling/InputHandler.js'
 
 document.getElementById("startsingleplayer").addEventListener("click", function() {
-    let playerBoard = clientPlayer;
+let playerBoard = clientPlayer;
 
     let clientInputHandler = new InputHandler(playerBoard);
     clientInputHandler.bindHandlerToDocument(document);
@@ -18,8 +18,8 @@ document.getElementById("startsingleplayer").addEventListener("click", function(
 document.getElementById("startmultiplayer").addEventListener("click", function() {
     let playerBoard = clientPlayer;
 
-    let clientInputHandler = new InputHandler(playerBoard);
-    clientInputHandler.bindHandlerToDocument(document);
+let clientInputHandler = new InputHandler(playerBoard);
+clientInputHandler.bindHandlerToDocument(document);
 
     playerBoard.show();
     connectedPlayer.show();

@@ -1,28 +1,41 @@
 import clientPlayer from './game/ClientPlayer/CreateClientPlayer.js'
 import connectedPlayer from './game/ExtraPlayers/CreateSecondPlayer.js'
 import {InputHandler} from './inputHandling/InputHandler.js'
-import {ping} from './net/Pinger.js'
 
+document.getElementById("startsingleplayer").addEventListener("click", function() {
 let playerBoard = clientPlayer;
 
-console.log(connectedPlayer)
+    let clientInputHandler = new InputHandler(playerBoard);
+    clientInputHandler.bindHandlerToDocument(document);
 
-// let pingATestButton = document.createElement('button')
-// let pingBTestButton = document.createElement('button')
+    playerBoard.show();
+    connectedPlayer.hide();
+    hideStartScreen();
+    hideMultiplayer();
+});
 
-// pingATestButton.innerHTML = 'PINGA'
-// pingATestButton.addEventListener('click', () => {
-//     ping('A')
-// })
 
-// pingBTestButton.innerHTML = 'PINGB'
-// pingBTestButton.addEventListener('click', () => {
-//     ping('B')
-// })
-
-// document.body.appendChild(pingATestButton)
-// document.body.appendChild(pingBTestButton)
-
+document.getElementById("startmultiplayer").addEventListener("click", function() {
+    let playerBoard = clientPlayer;
 
 let clientInputHandler = new InputHandler(playerBoard);
 clientInputHandler.bindHandlerToDocument(document);
+
+    playerBoard.show();
+    connectedPlayer.show();
+
+    hideStartScreen();
+    hideSingleplayer();
+});
+
+function hideStartScreen(){
+
+}
+
+function hideMultiplayer(){
+
+}
+
+function hideSingleplayer(){
+
+}
