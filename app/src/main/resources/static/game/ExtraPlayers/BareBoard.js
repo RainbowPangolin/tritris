@@ -23,6 +23,7 @@ export class BareBoard{
         this.containerDiv = containerDiv;
         containerDiv.id ="onlineplayer";
         this.containerDiv.classList.add('hidden');
+        this.containerDiv.classList.add('gameboard');
 
         this.domDocument.body.append(containerDiv);
 

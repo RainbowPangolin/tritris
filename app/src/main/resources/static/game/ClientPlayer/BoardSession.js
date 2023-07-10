@@ -44,6 +44,7 @@ export class BoardSession extends EventTarget{
         this.containerDiv = containerDiv;
         containerDiv.id ="clientplayer";
         this.containerDiv.classList.add('hidden');
+        this.containerDiv.classList.add('gameboard');
 
         this.domDocument.body.append(containerDiv);
 
