@@ -6,4 +6,4 @@
 
 [Feedback](mailto:kktsou@ucsd.edu)
 
-[For Devs](/wiki/DevTodo.md)
+[For Devs](/wiki/DevNotes.md)
