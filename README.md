@@ -2,8 +2,8 @@
 
 ## A Multiplayer Tetris Clone focused on 4Wide competitive gameplay
 
-Report Issues
+[Report Issues](https://github.com/RainbowPangolin/tritris/issues)
 
-Feedback
+[Feedback](mailto:kktsou@ucsd.edu)
 
-For Devs
+[For Devs](/wiki/DevTodo.md)
