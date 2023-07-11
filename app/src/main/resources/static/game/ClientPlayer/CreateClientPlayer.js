@@ -69,6 +69,9 @@ connectTestButton.disabled = true
 
 let roomIDManualInput = document.createElement('input')
 roomIDManualInput.type = 'text'
+// TODO  undisable when multiplayer available
+roomIDManualInput.classList.add('disabled-input')
+roomIDManualInput.setAttribute('disabled', 'true')
 roomIDManualInput.innerHTML = 'ROOMID'
 roomIDManualInput.addEventListener('click', () => {
     playerBoard.setRoomID(roomIDManualInput.innerHTML)
