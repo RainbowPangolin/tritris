@@ -11,6 +11,9 @@ COPY gradle gradle
 COPY app/build.gradle .
 COPY settings.gradle .
 
+# Change permissions of the Gradle Wrapper script
+RUN chmod +x gradlew
+
 # Resolve dependencies and cache them
 RUN ./gradlew dependencies
 
