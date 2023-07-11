@@ -46,9 +46,28 @@
       button {
         position: relative
       }
+
+      footer {
+        background-color: #f1f1f1;
+        padding: 10px;
+        text-align: center;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+      }
+
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        min-height: calc(100% - 40px); /* Adjust the value as needed */
+
+      }
+
+
     </style>
   </head>
-  <body>
+  <body class="content">
     
   <navigation>
     <!-- <button>Options</button> -->
@@ -82,15 +101,11 @@
     <button id="backbutton" class="hidden">Exit</button>
   </div>
 
-  <div>
-  <p>Build Jul-11-2023</p>    
-  </div>
-
     <!-- <canvas class="backGround" width = 250 height= 550></canvas> -->
-    <script type="module" src="./main.js" >
-    </script>
-    
-  <!-- <script type="module" src="./net/MessageHandlers/SendRoomNegotiation.js" > -->
-  </script>
+  <script type="module" src="./main.js"></script>
+      
+    <!-- <script type="module" src="./net/MessageHandlers/SendRoomNegotiation.js" > </script> -->
+
   </body>
+
 </html>
