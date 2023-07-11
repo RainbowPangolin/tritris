@@ -24,4 +24,4 @@ COPY app/src src
 RUN ./gradlew build
 
 # Specify the command to run the application
-CMD ["./gradlew", "bootRun"]
+CMD ["java", "-jar", "app/build/libs/app.jar"]
