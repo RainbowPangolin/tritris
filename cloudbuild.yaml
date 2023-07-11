@@ -5,6 +5,6 @@ steps:
       - '-c'
       - |
         chmod +x gradlew
-        ./gradlew clean build --warning-mode all -Dorg.gradle.java.installations.auto-detect=true
+        ./gradlew clean build --warning-mode all 
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['run', 'deploy', 'tritris', '--image', 'gcr.io/$PROJECT_ID/tritris', '--region', 'us-central1', '--platform', 'managed']
