@@ -15,7 +15,7 @@ COPY settings.gradle .
 RUN chmod +x gradlew
 
 # Resolve dependencies and cache them
-RUN ./gradlew dependencies
+# RUN ./gradlew dependencies
 
 # Copy the application source code to the container
 COPY app/src src
@@ -24,4 +24,4 @@ COPY app/src src
 RUN ./gradlew build
 
 # Specify the command to run the application
-CMD ["java", "-jar", "app/build/libs/app.jar"]
+CMD ["java", "-jar", "build/libs/DStris.jar"]
