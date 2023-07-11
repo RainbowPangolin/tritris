@@ -5,6 +5,6 @@ steps:
       - '-c'
       - |
         chmod +x gradlew
-        ./gradlew clean build --warning-mode all -Dorg.gradle.java.installations.auto-detect=false -Dorg.gradle.java.installations.paths=/usr/lib/jvm/java-17-openjdk-amd64
+        ./gradlew clean build --warning-mode all -Dorg.gradle.java.installations.auto-detect=false -Dorg.gradle.java.installations.paths=/usr/lib/jvm/java-17-openjdk-amd64 -Dorg.gradle.java.home=/usr/lib/jvm/java-17-openjdk-amd64
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['run', 'deploy', 'tritris', '--image', 'gcr.io/$PROJECT_ID/tritris', '--region', 'us-central1', '--platform', 'managed']
