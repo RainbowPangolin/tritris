@@ -251,6 +251,7 @@ export class BoardSession extends EventTarget{
     }
 
     //TODO Improve gravity system
+    //TODO Apply gravity buffer on transform
     initializeGravity(){
         setInterval(() => {
             let lastPosition = this.activePiece.positionOfCenterBlock;
