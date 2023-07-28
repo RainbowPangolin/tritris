@@ -9,9 +9,6 @@ Details not shared.
 
 ## Todo list for (the) dev
 
-###
-- Complete initial deployment
-
 ### Network features
 - Complete networked multiplayer 
   - Win/loss conditions should be verified on server and sent to clients
