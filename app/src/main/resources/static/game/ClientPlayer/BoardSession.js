@@ -247,7 +247,8 @@ export class BoardSession extends EventTarget{
     }
 
     changeGravity(gravity){
-        this.gravity = gravity
+        this.gravity = gravity;
+        this.bufferingGravityDrop
     }
 
     //TODO Improve gravity system
@@ -257,8 +258,10 @@ export class BoardSession extends EventTarget{
             let lastPosition = this.activePiece.positionOfCenterBlock;
             this.activePiece.performAction('MOVEDOWN');
             let currentPosition = this.activePiece.positionOfCenterBlock;
-            if(lastPosition[0] == currentPosition[0]){
-                this.activePiece.performAction('HARDDROP');
+            if(!this.bufferingGravityDrop){
+                if(lastPosition[0] == currentPosition[0]){
+                    this.activePiece.performAction('HARDDROP');
+                }
             }
         }, this.gravity * 1000)
     }
