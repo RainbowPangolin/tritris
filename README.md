@@ -2,7 +2,7 @@
 
 ## Overview 
 
-This is a Multiplayer Tetris Clone based on a 4 wide grid, rather than a traditional 10 wide grid. I was inspired to make this by [Tetr.io's 4 wide mode](youtube.com/watch?v=5IbvrTA2hJg), since currently normal users are not able to make 4 wide based multiplayer lobbies. 
+This is a Multiplayer Tetris Clone based on a 4 wide grid, rather than a traditional 10 wide grid. I was inspired to make this by [Tetr.io's 4 wide mode](youtube.com/watch?v=5IbvrTA2hJg), since currently normal users are not able to make 4 wide based multiplayer lobbies. This was built from the ground up to be a fast, responsive, and fun Modern Tetris clone.
 
 The latest deployment can be found at https://tritris-4btnjlmuaq-uc.a.run.app/
 
