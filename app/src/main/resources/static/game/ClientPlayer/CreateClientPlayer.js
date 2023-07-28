@@ -20,6 +20,7 @@ let playerBoard = new BoardSession({
     height: 22,
     domDocument: document,
     bagSystem: '7-bag',
+    gravity: 1,
     playerID: generateRandomPlayerID()
 })
 

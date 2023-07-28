@@ -219,6 +219,8 @@ export class BoardSession extends EventTarget{
         this.gameOngoing = true
         this.insertNewPieceWithShapeAndLocation(this.getUpcomingShape())
         this.removeNextPieceFromQueue()
+
+        this.initializeGravity();
     }
 
     //TODO Block inputs here.
@@ -246,6 +248,18 @@ export class BoardSession extends EventTarget{
 
     changeGravity(gravity){
         this.gravity = gravity
+    }
+
+    //TODO Improve gravity system
+    initializeGravity(){
+        setInterval(() => {
+            let lastPosition = this.activePiece.positionOfCenterBlock;
+            this.activePiece.performAction('MOVEDOWN');
+            let currentPosition = this.activePiece.positionOfCenterBlock;
+            if(lastPosition == currentPosition){
+                this.activePiece.performAction('HARDDROP');
+            }
+        }, this.gravity * 1000)
     }
     
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
