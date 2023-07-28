@@ -67,11 +67,20 @@ export class InputHandler{
             if(LR_MOVES.includes(mappedAction) && (this.moveDirBuffer[0] != mappedAction)){
                 return
             }
-            
-            if(holdTime >= this.turboDelay && (curTime - lastTime >= interval)){
-                this.keysToLastDASTime.set(key, curTime) 
-                this.playerBoard.receiveInput(input)
+
+            if (input == 'MOVEDOWN'){
+                if((curTime - lastTime >= interval)){
+                    this.keysToLastDASTime.set(key, curTime) 
+                    this.playerBoard.receiveInput(input)
+                }
+            } else {
+                if(holdTime >= this.turboDelay && (curTime - lastTime >= interval)){
+                    this.keysToLastDASTime.set(key, curTime) 
+                    this.playerBoard.receiveInput(input)
+                }
             }
+            
+
         } catch (error){
             console.log(error, "Caused by key:", key)
         }
