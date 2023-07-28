@@ -256,7 +256,7 @@ export class BoardSession extends EventTarget{
             let lastPosition = this.activePiece.positionOfCenterBlock;
             this.activePiece.performAction('MOVEDOWN');
             let currentPosition = this.activePiece.positionOfCenterBlock;
-            if(lastPosition == currentPosition){
+            if(lastPosition[0] == currentPosition[0]){
                 this.activePiece.performAction('HARDDROP');
             }
         }, this.gravity * 1000)
