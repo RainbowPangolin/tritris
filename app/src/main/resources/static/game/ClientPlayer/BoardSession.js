@@ -191,9 +191,6 @@ export class BoardSession extends EventTarget{
     }
 
     drawGrid({canvas, alpha}) {
-        console.log(canvas);
-        console.log(alpha)
-
         const context = canvas.getContext('2d')
         const rows = this.height;
         const columns = this.width;
@@ -311,6 +308,7 @@ export class BoardSession extends EventTarget{
     pause(){
         clearInterval(this.gravityInterval);
         disableInput();
+        console.log('asdf')
     }
 
     unpause(){
@@ -613,7 +611,7 @@ export class BoardSession extends EventTarget{
         connectedPlayersItem.innerHTML = playerID
         this.connectedPlayersListDomElement.append(connectedPlayersItem)
 
-        console.log('asdf!', playerID)
+        console.log('Added player!', playerID)
     }
 
     show(){
