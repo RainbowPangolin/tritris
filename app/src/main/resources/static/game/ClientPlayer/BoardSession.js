@@ -307,13 +307,18 @@ export class BoardSession extends EventTarget{
 
     pause(){
         clearInterval(this.gravityInterval);
-        disableInput();
-        console.log('asdf')
+        // disableInput();
+        console.log('paused')
+
+        this.gameOngoing = false;
     }
 
     unpause(){
-        initializeGravity();
-        enableInput();
+        this.initializeGravity();
+        // enableInput();
+        console.log('unpaused')
+
+        this.gameOngoing = true;
     }
 
     disableInput(){
@@ -503,10 +508,12 @@ export class BoardSession extends EventTarget{
         } else if (MISC_ACTIONS.has(action)){
             this.performBoardAction(action)
         }  else if (action === 'PAUSE') {
-            this.pause();
-        }  else if (action === 'UNPAUSE') {
-            this.unpause();
-        } else {
+            if(this.gameOngoing){
+                this.pause();
+            } else {
+                this.unpause();
+            }
+        }  else {
             throw new Error('Illegal action attempted')
         }
     }
