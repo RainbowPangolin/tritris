@@ -136,6 +136,7 @@ export class BoardSession extends EventTarget{
         this.blockSize = DEFAULT_BLOCK_SIZE
 
         this.placedMinoBoardCanvas = this.getNewCanvas()
+        this.gridOverlay = this.getNewCanvas({gridOverlay: true})
         this.activeMinoBoardCanvas = this.getNewCanvas()
         this.debugCanvas = this.getNewCanvas()
         this.heldPieceCanvas = this.getNewCanvas({type: 'heldPieceCanvas'})
@@ -149,6 +150,7 @@ export class BoardSession extends EventTarget{
         mainCanvasDiv.style.width = String(this.width*this.blockSize+'px')
         mainCanvasDiv.style.height = String(this.height*this.blockSize+'px')
         mainCanvasDiv.append(this.placedMinoBoardCanvas) 
+        mainCanvasDiv.append(this.gridOverlay) 
         mainCanvasDiv.append(this.debugCanvas)
         mainCanvasDiv.append(this.activeMinoBoardCanvas)
 
@@ -170,7 +172,7 @@ export class BoardSession extends EventTarget{
     }
 
     //TODO All this is garbage still, I shoudl abstract it into a new object or interface
-    getNewCanvas({type = 'minoBoardCanvas'} = {}){
+    getNewCanvas({type = 'minoBoardCanvas', gridOverlay = false} = {}){
         let newCanvas = this.domDocument.createElement("canvas");
         if(type == 'minoBoardCanvas'){
             newCanvas.width = this.blockSize*this.width 
@@ -181,7 +183,46 @@ export class BoardSession extends EventTarget{
             newCanvas.height = this.blockSize*3
         }
 
+        if (gridOverlay){
+            this.drawGrid({canvas: newCanvas, alpha: .11});
+        }
+
         return newCanvas
+    }
+
+    drawGrid({canvas, alpha}) {
+        console.log(canvas);
+        console.log(alpha)
+
+        const context = canvas.getContext('2d')
+        const rows = this.height;
+        const columns = this.width;
+
+        // Calculate the size of each cell in the grid
+        const cellWidth = this.blockSize
+        const cellHeight = this.blockSize
+
+        context.strokeStyle = `rgba(0, 0, 0, ${alpha})`;
+
+
+        // Draw vertical grid lines
+        for (let col = 0; col <= columns; col++) {
+            const x = col * cellWidth;
+            context.beginPath();
+            context.moveTo(x, 0);
+            context.lineTo(x, canvas.height);
+            context.stroke();
+        }
+        
+        // Draw horizontal grid lines
+        for (let row = 0; row <= rows; row++) {
+            const y = row * cellHeight;
+            context.beginPath();
+            context.moveTo(0, y);
+            context.lineTo(canvas.width, y);
+            context.stroke();
+        }
+
     }
 
     getNewPreviewCanvases(){
