@@ -15,7 +15,8 @@ const defaultConfig = {
         ' ': 'HARDDROP',
         't': 'START',
         'y': 'END',
-        'r': 'RESTART'
+        'r': 'RESTART',
+        'Escape': 'PAUSE',
     },
     turboDelay: 200, // milliseconds before the first repeat
     turboInterval: 20 // milliseconds between repeats

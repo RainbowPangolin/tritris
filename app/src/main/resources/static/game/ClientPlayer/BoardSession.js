@@ -308,6 +308,41 @@ export class BoardSession extends EventTarget{
         }, this.gravity * 1000)
     }
 
+    pause(){
+        clearInterval(this.gravityInterval);
+        disableInput();
+    }
+
+    unpause(){
+        initializeGravity();
+        enableInput();
+    }
+
+    disableInput(){
+        // Define the event listener function
+        function handleKeyPress(event) {
+            // Check if the pressed key is the escape key
+            if (event.key === 'Escape') {
+            // Allow the escape key
+            // You can add your specific handling for the escape key here if needed
+            console.log('Escape key pressed.');
+            } else {
+            // Prevent the default behavior for all other keys
+            event.preventDefault();
+            }
+        }
+        
+        // Add the event listener and store its reference in a variable
+        this.keyPressEventListener = handleKeyPress;
+        document.addEventListener('keydown', this.keyPressEventListener);
+
+    }
+
+    enableInput(){
+        document.removeEventListener('keydown', this.keyPressEventListener);
+    }
+
+
     
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
         try{
@@ -469,6 +504,10 @@ export class BoardSession extends EventTarget{
             }
         } else if (MISC_ACTIONS.has(action)){
             this.performBoardAction(action)
+        }  else if (action === 'PAUSE') {
+            this.pause();
+        }  else if (action === 'UNPAUSE') {
+            this.unpause();
         } else {
             throw new Error('Illegal action attempted')
         }
