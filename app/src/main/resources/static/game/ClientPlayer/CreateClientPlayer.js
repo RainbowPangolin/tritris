@@ -16,7 +16,7 @@ function generateRandomPlayerID() {
 }
 
 let playerBoard = new BoardSession({
-    width: 10,
+    width: 4,
     height: 22,
     domDocument: document,
     bagSystem: '7-bag',
