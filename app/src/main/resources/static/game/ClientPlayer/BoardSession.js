@@ -254,7 +254,8 @@ export class BoardSession extends EventTarget{
     //TODO Improve gravity system
     //TODO Apply gravity buffer on transform
     initializeGravity(){
-        setInterval(() => {
+        clearInterval(this.gravityInterval);
+        this.gravityInterval = setInterval(() => {
             let lastPosition = this.activePiece.positionOfCenterBlock;
             this.activePiece.performAction('MOVEDOWN');
             let currentPosition = this.activePiece.positionOfCenterBlock;
@@ -265,6 +266,7 @@ export class BoardSession extends EventTarget{
             }
         }, this.gravity * 1000)
     }
+
     
     insertNewPieceWithShapeAndLocation(shape, location = [2, 4]){
         try{
