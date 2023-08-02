@@ -29,3 +29,8 @@ export function getConfig(){
     }
 
 }
+
+
+export function setConfig(key_value_pair){
+
+}
