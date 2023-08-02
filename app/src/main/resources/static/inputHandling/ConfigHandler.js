@@ -17,15 +17,15 @@ const defaultConfig = {
     turboInterval: 20 // milliseconds between repeats
 }
 
-const curBindings = localStorage.getItem('inputconfig');
-
-if(curBindings){
-    console.log(curBindings);
-} else {
-    console.log('no bindings found')
-}
-
 export function getConfig(){
-    console.log(defaultConfig);
-    return defaultConfig;
+
+    const curBindings = localStorage.getItem('inputconfig');
+
+    if(curBindings){
+        return curBindings;
+    } else {
+        localStorage.setItem('inputconfig', JSON.stringify(defaultConfig));
+        return defaultConfig;
+    }
+
 }
