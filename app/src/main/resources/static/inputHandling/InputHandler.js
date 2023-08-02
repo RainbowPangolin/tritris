@@ -1,43 +1,43 @@
-// Define a default configuration object
+import { getConfig } from "./ConfigHandler.js";
 
 const TURBO_ELIGIBLE_MOVES = ['MOVERIGHT', 'MOVELEFT', 'MOVEDOWN']
 const LR_MOVES = ['MOVERIGHT', 'MOVELEFT']
 
-const defaultConfig = {
-    bindings: {
-        'k': 'MOVEDOWN',
-        'l': 'MOVERIGHT',
-        'j': 'MOVELEFT',
-        'a': 'ROTATELEFT',
-        'd': 'ROTATERIGHT',
-        'w': 'ROTATE180',
-        'i': 'HOLD',
-        ' ': 'HARDDROP',
-        't': 'START',
-        'y': 'END',
-        'r': 'RESTART',
-        'p': 'PAUSE',
-    },
-    turboDelay: 200, // milliseconds before the first repeat
-    turboInterval: 20 // milliseconds between repeats
-}
+// const defaultConfig = {
+//     bindings: {
+//         'k': 'MOVEDOWN',
+//         'l': 'MOVERIGHT',
+//         'j': 'MOVELEFT',
+//         'a': 'ROTATELEFT',
+//         'd': 'ROTATERIGHT',
+//         'w': 'ROTATE180',
+//         'i': 'HOLD',
+//         ' ': 'HARDDROP',
+//         't': 'START',
+//         'y': 'END',
+//         'r': 'RESTART',
+//         'p': 'PAUSE',
+//     },
+//     turboDelay: 200, // milliseconds before the first repeat
+//     turboInterval: 20 // milliseconds between repeats
+// }
 
 export class InputHandler{
     constructor(playerBoard){
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.playerBoard = playerBoard
-        this.config = JSON.parse(localStorage.getItem('config')) || defaultConfig
-        this.lastTime = 0
-        this.turboRepeat = null
-        this.turboDelay = 170 // default turbo delay in ms
-        this.turboInterval = 20
-        this.softDropInterval = 20
+        this.playerBoard = playerBoard;
+        this.config = getConfig();
+        this.lastTime = 0;
+        this.turboRepeat = null;
+        this.turboDelay = 170; // default turbo delay in ms
+        this.turboInterval = 20;
+        this.softDropInterval = 20;
 
-        this.keysPressed = new Set()
-        this.keysToHoldRequestID = new Map()
-        this.keysToLastDASTime = new Map()
-        this.moveDirBuffer = []
+        this.keysPressed = new Set();
+        this.keysToHoldRequestID = new Map();
+        this.keysToLastDASTime = new Map();
+        this.moveDirBuffer = [];
     }
 
     handleTurbo(timestamp, key){
